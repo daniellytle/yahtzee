@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.17.0",
-    "@testing-library/react": "^13.4.0",
+    "@testing-library/react": "^15.0.6",
     "@testing-library/user-event": "^13.5.0",
     "@types/jest": "^27.5.2",
     "@types/node": "^16.18.98",
@@ -39,5 +39,12 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@headlessui/react": "^2.0.4",
+    "classnames": "^2.5.1",
+    "jest-transform-stub": "^2.0.0",
+    "tailwindcss": "^3.4.4",
+    "ts-jest": "^29.1.4"
   }
 }
