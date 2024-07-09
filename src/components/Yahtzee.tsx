@@ -15,7 +15,7 @@ function Yahtzee() {
   const [rollsRemaining, setRollsRemaining] = useState(2)
   const [selectedDice, setSelectedDice] = useState<Set<number>>(new Set())
 
-  const handleKeyPress = (event: Event) => {
+  const handleKeyDown = (event: Event) => {
     if ("key" in event && typeof event.key == 'string') {
       event.preventDefault()
       if (event.key === ' ') {
@@ -32,8 +32,8 @@ function Yahtzee() {
   }, [])
 
   useEffect(() => {
-    window.addEventListener('keypress', handleKeyPress)
-    return () => window.removeEventListener('keypress', handleKeyPress)
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
   }, [selectedDice, rollsRemaining, rolling])
 
   const selectDie = (index: number) => {
