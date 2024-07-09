@@ -1,4 +1,4 @@
-import { KeyboardEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import ScoreCard from "./ScoreCard";
 import Dice from "./Dice";
 import { diceRoll, getFreshDice } from "../game/utils";
@@ -15,8 +15,8 @@ function Yahtzee() {
   const [rollsRemaining, setRollsRemaining] = useState(2)
   const [selectedDice, setSelectedDice] = useState<Set<number>>(new Set())
 
-  const handleKeyDown = (event: Event) => {
-    if ("key" in event && typeof event.key == 'string') {
+  const handleKeyDown = (event: KeyboardEvent):any => {
+    if (!event.metaKey && !event.ctrlKey && ['1', '2', '3', '4', '5', ' '].includes(event.key)) {
       event.preventDefault()
       if (event.key === ' ') {
         roll(selectedDice, rollsRemaining)
