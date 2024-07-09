@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react"
+import { KeyboardEvent, ReactNode, useEffect } from "react"
 import Die from "./Die"
 import classNames from "classnames"
 
@@ -17,13 +17,14 @@ function Dice({
   selectedDice: Set<number>
   selectDie: (x: number) => void
 }) {
+
   const handleRollClick = () => {
     roll(selectedDice, rollsRemaining)
   }
 
   const renderDice = (dice: number[]): ReactNode => {
     return (
-      <div className="flex justify-center mb-10 items-start gap-4">
+      <div  className="flex justify-center mb-10 items-start gap-4">
         {dice.map((die, index) => {
           const dieRolling = !selectedDice.has(index) && rolling
           return (
@@ -52,7 +53,7 @@ function Dice({
       {renderDice(dice)}
       <div
         className={classNames("mb-4 justify-center bg-red-600 border-b-4 border-red-400 flex text-white text-2xl px-16 py-4 cursor-pointer rounded-xl transition-all",
-          {"opacity-40": rollsRemaining == 0},
+          {"opacity-40": rollsRemaining === 0},
           {"hover:opacity-90 active:border-0": rollsRemaining > 0})}
         onClick={handleRollClick}
       >

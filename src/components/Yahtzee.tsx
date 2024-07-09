@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { KeyboardEvent, useEffect, useState } from "react";
 import ScoreCard from "./ScoreCard";
 import Dice from "./Dice";
 import { diceRoll, getFreshDice } from "../game/utils";
@@ -7,12 +7,34 @@ import { GameReport } from "./GameReport";
 
 function Yahtzee() {
 
-  const [dice, setDice] = useState<number[]>(getFreshDice())
+  const [dice, setDice] = useState<number[]>([])
   const [reportOpen, setReportOpen] = useState(false)
   const [rolling, setRolling] = useState<boolean>(false)
   const [scores, setScores] = useState<{[key:string]: number}>({})
+  const [scoreSheets, setScoreSheets] = useState<{[key:string]: number}[]>([])
   const [rollsRemaining, setRollsRemaining] = useState(2)
   const [selectedDice, setSelectedDice] = useState<Set<number>>(new Set())
+
+  const handleKeyPress = (event: Event) => {
+    if ("key" in event && typeof event.key == 'string') {
+      event.preventDefault()
+      if (event.key === ' ') {
+        roll(selectedDice, rollsRemaining)
+      } else if ([1,2,3,4,5].includes(parseInt(event.key))) {
+        const key = parseInt(event.key)
+        selectDie(key - 1)
+      }
+    }
+  }
+
+  useEffect(() => {
+    setDice(getFreshDice())
+  }, [])
+
+  useEffect(() => {
+    window.addEventListener('keypress', handleKeyPress)
+    return () => window.removeEventListener('keypress', handleKeyPress)
+  }, [selectedDice, rollsRemaining, rolling])
 
   const selectDie = (index: number) => {
     if (rollsRemaining > 0) {
@@ -27,6 +49,7 @@ function Yahtzee() {
   }
 
   const roll = (selectedDice: Set<number>, rollsRemaining = 3) => {
+    console.log(selectedDice, rollsRemaining)
     if (rollsRemaining > 0 && !rolling) {
       setRolling(true)
       setDice((previous: number[]) => {
@@ -36,8 +59,9 @@ function Yahtzee() {
       })
       setRollsRemaining(rollsRemaining - 1)
       setTimeout(() => {
+        console.log("rolling false")
         setRolling(false)
-        if (rollsRemaining == 1) {
+        if (rollsRemaining === 1) {
           setSelectedDice(new Set())
         }
       }, 500)
@@ -57,11 +81,13 @@ function Yahtzee() {
     }
   }
 
-  const rollAllDice = (selectDice: Set<number> = new Set()) => {
-    roll(selectedDice)
+  const rollAllDice = () => {
+    roll(new Set())
+    setSelectedDice(new Set())
   }
 
   const resetGame = () => {
+    setScoreSheets(scoreSheets.concat(scores))
     setReportOpen(false)
     setScores({})
     rollAllDice()
@@ -74,10 +100,10 @@ function Yahtzee() {
           <Dice dice={dice} roll={roll} rolling={rolling} rollsRemaining={rollsRemaining} selectedDice={selectedDice} selectDie={selectDie} />
         </div>
         <div className="w-2/5 h-full flex content-center flex-wrap">
-          <ScoreCard scores={scores} dice={dice} scoreDice={scoreDice}/>
+          <ScoreCard scores={scores} dice={dice} scoreDice={scoreDice} rollsRemaining={rollsRemaining}/>
         </div>
       </div>
-      <GameReport isOpen={reportOpen} setIsOpen={setReportOpen} totalScore={Scoring.getTotalScore(scores)} resetGame={resetGame}/>
+      <GameReport isOpen={reportOpen} setIsOpen={setReportOpen} totalScore={Scoring.getTotalScore(scores)} resetGame={resetGame} scoreSheets={scoreSheets}/>
     </div>
   );
 }

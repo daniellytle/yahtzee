@@ -5,18 +5,20 @@ import {
   Transition,
   TransitionChild,
 } from "@headlessui/react"
-import { useState } from "react"
+import { sum } from "../game/utils"
+import Scoring from "../game/scoring"
 
 export function GameReport({
   isOpen,
-  setIsOpen,
   totalScore,
   resetGame,
+  scoreSheets,
 }: {
   isOpen: boolean
   setIsOpen: (x: boolean) => void
   totalScore: number
   resetGame: () => void
+  scoreSheets: {[key: string]: number}[]
 }) {
   return (
     <>
@@ -24,7 +26,7 @@ export function GameReport({
         <Dialog
           as="div"
           className="relative z-10 focus:outline-none"
-          onClose={() => setIsOpen(false)}
+          onClose={() => {}}
         >
           <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
             <div className="flex min-h-full items-center justify-center p-4">
@@ -46,6 +48,12 @@ export function GameReport({
                   <p className="mt-2 text-center text-xl">
                     Score: <b>{totalScore}</b>
                   </p>
+                  {/* <p className="mt-2 text-center text-xl">
+                    Previous Scores: <b>{scoreSheets.map(scoreSheet => Scoring.getTotalScore(scoreSheet)).join(" ")}</b>
+                  </p>
+                  {scoreSheets.length && <p className="mt-2 text-center text-xl">
+                    Avg Score: <b>{sum(scoreSheets.map(scoreSheet => Scoring.getTotalScore(scoreSheet))) / scoreSheets.length}</b>
+                  </p>} */}
                   <button className="mt-8 mx-auto bg-red-600 border-b-4 border-red-400 flex text-white text-2xl px-16 py-4 cursor-pointer rounded-xl" onClick={() => resetGame()}>
                     Play Again
                   </button>

@@ -6,10 +6,12 @@ function ScoreCard({
   scores,
   dice,
   scoreDice,
+  rollsRemaining,
 }: {
   scores: { [key: string]: number }
   dice: number[]
   scoreDice: (key: string, value: number) => void
+  rollsRemaining: number
 }) {
   const getScoreSheetValue = (key: string): number => {
     if (key in scores) {
@@ -32,6 +34,8 @@ function ScoreCard({
       <>
         {scorables.map((key, index) => {
           const locked = key in scores
+          const expectedValue: number = locked ? scores[key] : Scoring.scorableExpectedValue[key](dice, rollsRemaining)
+          const maxScore: number = Scoring.scorableMaxValue[key]
           return (
             <div
               key={index}
@@ -51,6 +55,19 @@ function ScoreCard({
               >
                 {getScoreSheetValue(key)}
               </div>
+              {/* {
+                !locked && <div
+                  className={classNames("w-12 align-middle",
+                    { "text-black": locked },
+                    { "text-gray-400": !locked }
+                  )}
+                >
+                  {expectedValue.toFixed(2)}
+                  <div className="w-full bg-gray-200 rounded-full h-1.5 dark:bg-gray-100">
+                    <div className="bg-blue-600 h-1.5 rounded-full dark:bg-blue-500" style={{width: `${(100 * expectedValue) / maxScore}%`}}></div>
+                  </div>
+                </div>
+              } */}
             </div>
           )
         })}
@@ -81,6 +98,7 @@ function ScoreCard({
         <div className="my-1 px-4 py-2 flex justify-between border-b">
           <div>Type</div>
           <div>Score</div>
+          {/* <div>EV</div> */}
         </div>
         {renderScorables(Scoring.countingScorables)}
         {renderBonus(scores)}
