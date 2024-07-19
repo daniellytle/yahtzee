@@ -1,6 +1,5 @@
 import classNames from "classnames"
 import { ReactNode } from "react"
-import { JsxElement } from "typescript"
 
 function Die({
   index,
@@ -91,7 +90,7 @@ function Die({
   return (
     <div
       className={classNames(
-        "shadow-md bg-white transition-all h-24 w-24 rounded-xl relative text-3xl flex content-center justify-center flex-wrap cursor-pointer hover:bg-gray-100"
+        "shadow-md bg-white transition-all h-16 w-16 lg:h-24 lg:w-24 rounded-xl relative text-3xl flex content-center justify-center flex-wrap cursor-pointer hover:bg-gray-100"
       )}
       onClick={selectDie}
     >

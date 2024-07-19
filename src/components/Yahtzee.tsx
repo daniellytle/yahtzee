@@ -49,7 +49,6 @@ function Yahtzee() {
   }
 
   const roll = (selectedDice: Set<number>, rollsRemaining = 3) => {
-    console.log(selectedDice, rollsRemaining)
     if (rollsRemaining > 0 && !rolling) {
       setRolling(true)
       setDice((previous: number[]) => {
@@ -59,7 +58,6 @@ function Yahtzee() {
       })
       setRollsRemaining(rollsRemaining - 1)
       setTimeout(() => {
-        console.log("rolling false")
         setRolling(false)
         if (rollsRemaining === 1) {
           setSelectedDice(new Set())
@@ -94,13 +92,13 @@ function Yahtzee() {
   }
 
   return (
-    <div className="w-screen h-screen bg-slate-200">
-      <div className="container mx-auto font-bold h-screen flex">
-        <div className="w-3/5 h-full flex justify-center content-center flex-wrap">
-          <Dice dice={dice} roll={roll} rolling={rolling} rollsRemaining={rollsRemaining} selectedDice={selectedDice} selectDie={selectDie} />
-        </div>
-        <div className="w-2/5 h-full flex content-center flex-wrap">
+    <div className="w-screen h-screen bg-slate-200 flex">
+      <div className="container mx-auto font-bold lg:flex">
+        <div className="order-2 h-3/5 lg:m-0 w-full lg:w-2/5 lg:h-full flex content-center flex-wrap">
           <ScoreCard scores={scores} dice={dice} scoreDice={scoreDice} rollsRemaining={rollsRemaining}/>
+        </div>
+        <div className="order-1 h-2/5 lg:m-0 w-full lg:w-3/5 lg:h-full flex justify-center content-center flex-wrap">
+          <Dice dice={dice} roll={roll} rolling={rolling} rollsRemaining={rollsRemaining} selectedDice={selectedDice} selectDie={selectDie} />
         </div>
       </div>
       <GameReport isOpen={reportOpen} setIsOpen={setReportOpen} totalScore={Scoring.getTotalScore(scores)} resetGame={resetGame} scoreSheets={scoreSheets}/>

@@ -27,5 +27,5 @@ export class Analytics {
   }
 }
 
-// Analytics.playGames(new SmartPlayer(), 1000)
-Analytics.playGames(new SmartPlayer(), 1, true)
+Analytics.playGames(new SmartPlayer(), 1000)
+// Analytics.playGames(new NaivePlayer(), 1000)

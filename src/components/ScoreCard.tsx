@@ -93,17 +93,19 @@ function ScoreCard({
   }
 
   return (
-    <div className="w-full max-w-md mx-auto">
-      <div className="shadow-md grid grid-cols-1 p-2 bg-white border-gray-100 border rounded-xl">
-        <div className="my-1 px-4 py-2 flex justify-between border-b">
-          <div>Type</div>
+    <div className="w-full h-full max-w-md px-4 mx-auto flex">
+      <div className="mt-4 self-center h-full lg:h-auto w-full shadow-md grid grid-cols-1 p-2 bg-white border-gray-100 border rounded-xl">
+        <div className="mt-1 px-4 pb-2 flex justify-between border-b">
           <div>Score</div>
+          <div>Points</div>
           {/* <div>EV</div> */}
         </div>
-        {renderScorables(Scoring.countingScorables)}
-        {renderBonus(scores)}
-        {renderScorables(Scoring.complexScorables)}
-        <div className="my-1 px-4 py-2 flex justify-between border-t">
+        <div className="overflow-scroll">
+          {renderScorables(Scoring.countingScorables)}
+          {renderBonus(scores)}
+          {renderScorables(Scoring.complexScorables)}
+        </div>
+        <div className="mb-1 px-4 pt-2 flex justify-between border-t">
           <div>Total</div>
           <div>{Scoring.getTotalScore(scores)}</div>
         </div>
