@@ -32,10 +32,6 @@ export enum SCORE_CATEGORY {
   Yahtzee = 12,
 }
 
-type WidgetMap = {
-  [gameStateKey: string]: Widget
-}
-
 export type ExpectedValueMap = {
   [key: string]: number
 }

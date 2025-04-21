@@ -100,19 +100,19 @@ describe("methods", () => {
     })
   })
 
-  describe("generatePossibleBooleanArrays", () => {
+  describe("generatePossiblBitArrays", () => {
     it("generates boolean arrays of length 1", () => {
       const result = getPossibleBitArrays(1).sort()
-      expect(result).toEqual([[false], [true]])
+      expect(result).toEqual([[0], [1]])
     })
 
     it("generates boolean arrays of length 2", () => {
       const result = getPossibleBitArrays(2).sort()
       expect(result).toEqual([
-        [false, false],
-        [false, true],
-        [true, false],
-        [true, true],
+        [0, 0],
+        [0, 1],
+        [1, 0],
+        [1, 1],
       ])
     })
   })
@@ -146,23 +146,22 @@ describe("methods", () => {
       const gameState: GameState = {
         topSum: 14,
         scoredCategories: [1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0],
-        yahtzeeBonusFlag: true,
+        yahtzeeBonusFlag: 1,
       }
       expect(encodeGameState(gameState)).toBe(
-        "14-[true,false,true,true,true,true,true,true,true,true,true,true,false]-true"
+        "14-[1,0,1,0,1,1,1,0,0,0,0,0,0,0]-1"
       )
     })
   })
 
   describe("decodeGameState", () => {
     it("decodes a string to a gameState", () => {
-      const gameStateString =
-        "14-[true,false,true,true,true,true,true,true,true,true,true,true,false]-false"
+      const gameStateString = "14-[1,0,1,0,1,1,1,0,0,0,0,0,0,0]-0"
       const { topSum, scoredCategories, yahtzeeBonusFlag } =
         decodeGameState(gameStateString)
       expect(topSum).toBe(14)
-      expect(scoredCategories[1]).toBe(false)
-      expect(yahtzeeBonusFlag).toBe(false)
+      expect(scoredCategories[1]).toBe(0)
+      expect(yahtzeeBonusFlag).toBe(0)
     })
   })
 
@@ -170,24 +169,10 @@ describe("methods", () => {
     it("updates the scoredCategories array", () => {
       const gameState: GameState = {
         topSum: 14,
-        scoredCategories: [
-          true,
-          false,
-          true,
-          false,
-          true,
-          true,
-          true,
-          true,
-          true,
-          true,
-          true,
-          true,
-          false,
-        ],
-        yahtzeeBonusFlag: true,
+        scoredCategories: [1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0],
+        yahtzeeBonusFlag: 1,
       }
-      expect(getStateAfterScoring(gameState, 3).scoredCategories[3]).toBe(true)
+      expect(getStateAfterScoring(gameState, 3).scoredCategories[3]).toBe(1)
     })
   })
 
@@ -195,22 +180,8 @@ describe("methods", () => {
     it("returns the indeces of false score categories", () => {
       const gameState: GameState = {
         topSum: 14,
-        scoredCategories: [
-          true,
-          false,
-          true,
-          false,
-          true,
-          true,
-          true,
-          true,
-          true,
-          true,
-          true,
-          true,
-          false,
-        ],
-        yahtzeeBonusFlag: true,
+        scoredCategories: [1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1],
+        yahtzeeBonusFlag: 1,
       }
       expect(getUnscoredCategories(gameState)).toEqual([1, 3, 12])
     })

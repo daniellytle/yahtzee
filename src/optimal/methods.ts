@@ -98,17 +98,6 @@ export const getYahtzeeScore = (roll: Roll, yahtzeeBonusFlag: Bit): number => {
     : 0
 }
 
-const getYahtzeeBonusFlagValue = (
-  gameState: GameState,
-  roll: Roll,
-  scoredCategory: SCORE_CATEGORY
-): boolean => {
-  // if (gameState.scoredCategories[])
-  // if the scored category is yahtzee and the roll is a yahtzee
-  // if the scored category is not yahtzee and the roll is a yahtzee
-  return false
-}
-
 export const getAllPossibleGameStateStrings = (): string[] => {
   const possibleWidgets: string[] = []
   // scored categories
@@ -290,7 +279,7 @@ export const getUnscoredCategories = (gameState: GameState): number[] => {
 
 export const buildWidgetForGameState = (
   gameState: GameState,
-  widgetMap: { [key: string]: Widget }
+  widgetMap: { [key: string]: number }
 ): Widget => {
   if (isFinalGameState(gameState)) {
     return {
@@ -312,7 +301,6 @@ export const buildWidgetForGameState = (
       (category: number) =>
         getScoreForRollInCategory(roll, category, gameState.yahtzeeBonusFlag) +
         widgetMap[encodeGameState(getStateAfterScoring(gameState, category))]
-          .expectedScore
     )
     const maxScoreEV = Math.max(...scores)
     const maxScoreCategory = unscoredCategories[scores.indexOf(maxScoreEV)]
@@ -424,8 +412,7 @@ export const buildWidgetForGameState = (
   // Return the widget data
   return {
     expectedScore: totalAvgEV,
-    firstKeepSetMap,
-    secondKeepSetMap,
-    scoreActionMap: ScoreActionEVMap,
+    // firstKeepSetMap,
+    // secondKeepSetMap,
   }
 }

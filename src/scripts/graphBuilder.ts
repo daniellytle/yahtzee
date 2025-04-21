@@ -10,7 +10,7 @@ require("fs")
 // Build game graph
 export const buildGameGraph = () => {
   // graph work backwards from final state
-  const widgetMap: { [key: string]: Widget } = {}
+  const widgetEVs: { [key: string]: number } = {}
   const gameStateStrings = getAllPossibleGameStateStrings()
   let counter = 0
   // start a clock
@@ -19,19 +19,26 @@ export const buildGameGraph = () => {
   // calculate EVs for each game state
   for (let gameStateString of gameStateStrings) {
     const gameState = decodeGameState(gameStateString)
-    widgetMap[gameStateString] = buildWidgetForGameState(gameState, widgetMap)
-
-    if (counter > 1000) {
-      break
-    }
+    widgetEVs[gameStateString] = buildWidgetForGameState(
+      gameState,
+      widgetEVs
+    ).expectedScore
     counter += 1
+    if (counter % 1000 === 0) {
+      const currentTime = Date.now()
+      const elapsedTime = currentTime - startTime
+      console.log(
+        `Processed ${counter}/${gameStateStrings.length} Widgets\nElapsed time: ${elapsedTime / 1000.0}s`
+      )
+      console.log("Latest EV: ", widgetEVs[gameStateString])
+    }
   }
   const endTime = Date.now()
   const elapsedTime = endTime - startTime
   console.log(`Processed ${counter} Widgets\nElapsed time: ${elapsedTime} ms`)
 
   // write the graph to a file
-  const graphString = JSON.stringify(widgetMap, null, 0)
+  const graphString = JSON.stringify(widgetEVs, null, 0)
   require("fs").writeFileSync("src/optimal/gameGraph.json", graphString)
 }
 
