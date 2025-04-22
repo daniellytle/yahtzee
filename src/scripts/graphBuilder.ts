@@ -15,17 +15,22 @@ export const buildGameGraph = () => {
   // start a clock
   const startTime = Date.now()
 
+  console.log("Building game graph...")
+
   // calculate EVs for each game state
   for (let gameStateString of gameStateStrings) {
     const gameState = decodeGameState(gameStateString)
-    widgetEVs[gameStateString] = buildWidgetForGameState(
-      gameState,
-      widgetEVs
-    ).expectedScore
-    counter += 1
-    if (isNaN(widgetEVs[gameStateString])) {
-      console.log(gameStateString)
+    try {
+      widgetEVs[gameStateString] = buildWidgetForGameState(
+        gameState,
+        widgetEVs
+      ).expectedScore
+      counter += 1
+    } catch (e) {
+      console.log(`Error processing game state: ${gameStateString} ${e}`)
+      return
     }
+
     if (counter % 1000 === 0) {
       const currentTime = Date.now()
       const elapsedTime = currentTime - startTime

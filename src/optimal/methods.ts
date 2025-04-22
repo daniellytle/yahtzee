@@ -1,13 +1,6 @@
-import {
-  SCORE_CATEGORY,
-  Roll,
-  ExpectedValueMap,
-  Widget,
-  Bit,
-  GameState,
-} from "./types"
+import { SCORE_CATEGORY, Roll, Widget, Bit, GameState } from "./types"
 
-const isFinalGameState = (gameState: GameState): boolean => {
+export const isFinalGameState = (gameState: GameState): boolean => {
   return gameState.scoredCategories.every((category) => category === 1)
 }
 
@@ -148,18 +141,15 @@ export const getAllPossibleGameStateStrings = (): string[] => {
   const possibleWidgets: string[] = []
   // scored categories
   for (let scoredCategories of getPossibleBitArrays(13).sort()) {
-    // yahtzee bonus flag states
-    for (let yahtzeeBonusFlag of [1, 0] satisfies Bit[]) {
-      // top sum values
-      for (let topSum = 0; topSum < 64; topSum++) {
-        const gameState = {
-          topSum,
-          scoredCategories,
-          yahtzeeBonusFlag,
-        }
-        if (isGameStatePossible(gameState)) {
-          possibleWidgets.push(encodeGameState(gameState))
-        }
+    // top sum values
+    for (let topSum = 0; topSum < 64; topSum++) {
+      const gameState = {
+        topSum,
+        scoredCategories,
+        yahtzeeBonusFlag: scoredCategories[12],
+      }
+      if (isGameStatePossible(gameState)) {
+        possibleWidgets.push(encodeGameState(gameState))
       }
     }
   }
@@ -204,13 +194,16 @@ export const canSumFromMultiples = (
   return dp[target]
 }
 
-const isGameStatePossible = (gameState: GameState): boolean => {
+export const isGameStatePossible = (gameState: GameState): boolean => {
   // Can the topsum number be achieved with the scored categories?
-  const { topSum, scoredCategories } = gameState
+  const { topSum, scoredCategories, yahtzeeBonusFlag } = gameState
   const scoredNumbers = scoredCategories
     .slice(0, 6)
     .map((scoredCategory, index) => (scoredCategory ? index + 1 : 0))
-  return canSumFromMultiples(topSum, scoredNumbers)
+  return (
+    canSumFromMultiples(topSum, scoredNumbers) &&
+    scoredCategories[12] === yahtzeeBonusFlag
+  )
 }
 
 export const getPossibleRolls = () => {
@@ -291,13 +284,17 @@ export const mergeRolls = (roll1: Roll, roll2: Roll): Roll => {
 
 export const getStateAfterScoring = (
   gameState: GameState,
-  scoreCategory: number
+  scoreCategory: number,
+  score: number
 ): GameState => {
-  let { scoredCategories } = gameState
+  let { scoredCategories, topSum, yahtzeeBonusFlag } = gameState
   scoredCategories[scoreCategory] = 1
+  yahtzeeBonusFlag = scoreCategory === 12 ? 1 : gameState.scoredCategories[12]
+  topSum = Math.min(63, topSum + (scoreCategory < 6 ? score : 0))
   return {
-    ...gameState,
+    topSum,
     scoredCategories,
+    yahtzeeBonusFlag,
   }
 }
 
@@ -334,19 +331,25 @@ export const buildWidgetForGameState = (
   } = {}
   for (let roll of possibleRolls) {
     const scores = unscoredCategories.map((category: SCORE_CATEGORY) => {
+      const score = getScoreForRollInCategory(
+        roll,
+        category,
+        gameState.yahtzeeBonusFlag
+      )
       if (
         widgetMap[
-          encodeGameState(getStateAfterScoring(gameState, category))
+          encodeGameState(getStateAfterScoring(gameState, category, score))
         ] === undefined
       ) {
-        console.error(
-          encodeGameState(getStateAfterScoring(gameState, category))
-        )
-        throw "Next state not found in map"
+        throw `state EV ${encodeGameState(
+          getStateAfterScoring(gameState, category, score)
+        )} not found in map, previous state: ${encodeGameState(gameState)}`
       }
       return (
-        getScoreForRollInCategory(roll, category, gameState.yahtzeeBonusFlag) +
-        widgetMap[encodeGameState(getStateAfterScoring(gameState, category))]
+        score +
+        widgetMap[
+          encodeGameState(getStateAfterScoring(gameState, category, score))
+        ]
       )
     })
     const maxScoreEV = Math.max(...scores)
@@ -453,17 +456,20 @@ export const buildWidgetForGameState = (
     0, 0, 0, 0, 0, 0,
   ])
   const outcomeCounts = Object.keys(possibleOutcomesAndProbabilities).length
+  let totalOutcomeEVWeight = 0
   const outcomeEVs = Object.keys(possibleOutcomesAndProbabilities).map(
     (rollStr) => {
       const instances = possibleOutcomesAndProbabilities[rollStr]
       if (firstKeepSetMap[rollStr] === undefined) {
         console.error(rollStr)
-        throw ""
+        throw "roll not found in first keepset"
       }
-      return firstKeepSetMap[rollStr].EV * (instances / outcomeCounts)
+      totalOutcomeEVWeight += instances
+      return firstKeepSetMap[rollStr].EV * instances
     }
   )
-  const totalAvgEV = outcomeEVs.reduce((a, b) => a + b, 0) / outcomeCounts
+  const totalAvgEV =
+    outcomeEVs.reduce((a, b) => a + b, 0) / totalOutcomeEVWeight
 
   // Return the widget data
   return {

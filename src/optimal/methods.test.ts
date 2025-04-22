@@ -16,10 +16,43 @@ import {
   getOutcomeProbabilitiesFromKeepSet,
   buildWidgetForGameState,
   getScoreForRollInCategory,
+  isGameStatePossible,
+  isFinalGameState,
 } from "./methods"
 import { GameState, Roll } from "./types"
 
 describe("methods", () => {
+  describe("isGameStatePossible", () => {
+    it("returns false for a state where yahtzee is scored and the bonus is 1", () => {
+      const gameState: GameState = {
+        topSum: 0,
+        scoredCategories: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        yahtzeeBonusFlag: 0,
+      }
+      expect(isGameStatePossible(gameState)).toBe(false)
+    })
+  })
+
+  describe("isFinalGameState", () => {
+    it("detects a non-final game state", () => {
+      const gameState: GameState = {
+        topSum: 0,
+        scoredCategories: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        yahtzeeBonusFlag: 0,
+      }
+      expect(isFinalGameState(gameState)).toBe(false)
+    })
+
+    it("detects a game state that is final", () => {
+      const gameState: GameState = {
+        topSum: 0,
+        scoredCategories: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        yahtzeeBonusFlag: 1,
+      }
+      expect(isFinalGameState(gameState)).toBe(true)
+    })
+  })
+
   describe("getCountScore", () => {
     it("gets count score for twos", () => {
       const roll: Roll = [0, 3, 1, 1, 0, 0]
@@ -186,10 +219,11 @@ describe("methods", () => {
     it("updates the scoredCategories array", () => {
       const gameState: GameState = {
         topSum: 14,
-        scoredCategories: [1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0],
+        scoredCategories: [1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1],
         yahtzeeBonusFlag: 1,
       }
-      expect(getStateAfterScoring(gameState, 3).scoredCategories[3]).toBe(1)
+      const nextGameState = getStateAfterScoring(gameState, 3, 18)
+      expect(nextGameState.topSum).toBe(32)
     })
   })
 
@@ -303,7 +337,7 @@ describe("methods", () => {
         yahtzeeBonusFlag: 0,
       }
       const mockEVMap = {
-        "63-[1,1,1,1,1,1,1,1,1,1,1,1,1]-0": 35,
+        "63-[1,1,1,1,1,1,1,1,1,1,1,1,1]-1": 35,
       }
       const widget = buildWidgetForGameState(gameState, mockEVMap)
       expect(widget.scoreActionMap["[0,5,0,0,0,0]"]).toEqual({
@@ -319,7 +353,7 @@ describe("methods", () => {
         yahtzeeBonusFlag: 0,
       }
       const mockEVMap = {
-        "63-[1,1,1,1,1,1,1,1,1,1,1,1,1]-0": 35,
+        "63-[1,1,1,1,1,1,1,1,1,1,1,1,1]-1": 35,
       }
       const widget = buildWidgetForGameState(gameState, mockEVMap)
       expect(widget.secondKeepSetMap["[0,5,0,0,0,0]"]).toEqual({
@@ -339,7 +373,7 @@ describe("methods", () => {
         yahtzeeBonusFlag: 0,
       }
       const mockEVMap = {
-        "63-[1,1,1,1,1,1,1,1,1,1,1,1,1]-0": 35,
+        "63-[1,1,1,1,1,1,1,1,1,1,1,1,1]-1": 35,
       }
       const widget = buildWidgetForGameState(gameState, mockEVMap)
       expect(widget.secondKeepSetMap["[1,4,0,0,0,0]"]).toEqual({
