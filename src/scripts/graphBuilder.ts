@@ -3,7 +3,6 @@ import {
   decodeGameState,
   getAllPossibleGameStateStrings,
 } from "../optimal/methods"
-import { Widget } from "../optimal/types"
 
 require("fs")
 
@@ -24,13 +23,15 @@ export const buildGameGraph = () => {
       widgetEVs
     ).expectedScore
     counter += 1
+    if (isNaN(widgetEVs[gameStateString])) {
+      console.log(gameStateString)
+    }
     if (counter % 1000 === 0) {
       const currentTime = Date.now()
       const elapsedTime = currentTime - startTime
       console.log(
         `Processed ${counter}/${gameStateStrings.length} Widgets\nElapsed time: ${elapsedTime / 1000.0}s`
       )
-      console.log("Latest EV: ", widgetEVs[gameStateString])
     }
   }
   const endTime = Date.now()

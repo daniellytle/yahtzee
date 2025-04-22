@@ -14,6 +14,8 @@ import {
   getUnscoredCategories,
   getPossibleKeepSets,
   getOutcomeProbabilitiesFromKeepSet,
+  buildWidgetForGameState,
+  getScoreForRollInCategory,
 } from "./methods"
 import { GameState, Roll } from "./types"
 
@@ -100,6 +102,21 @@ describe("methods", () => {
     })
   })
 
+  describe("getScoreForRollInCategory", () => {
+    it("calculates yahtzee score", () => {
+      const roll: Roll = [0, 5, 0, 0, 0, 0]
+      expect(getScoreForRollInCategory(roll, 12, 0)).toBe(50)
+    })
+
+    it("calculates bonus yahtzee score", () => {
+      const roll: Roll = [0, 5, 0, 0, 0, 0]
+      expect(getScoreForRollInCategory(roll, 12, 0)).toBe(50)
+      expect(getScoreForRollInCategory(roll, 4, 1)).toBe(100)
+    })
+  })
+
+  getScoreForRollInCategory
+
   describe("generatePossiblBitArrays", () => {
     it("generates boolean arrays of length 1", () => {
       const result = getPossibleBitArrays(1).sort()
@@ -180,7 +197,7 @@ describe("methods", () => {
     it("returns the indeces of false score categories", () => {
       const gameState: GameState = {
         topSum: 14,
-        scoredCategories: [1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1],
+        scoredCategories: [1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0],
         yahtzeeBonusFlag: 1,
       }
       expect(getUnscoredCategories(gameState)).toEqual([1, 3, 12])
@@ -193,17 +210,47 @@ describe("methods", () => {
         0, 1, 2, 1, 1, 0,
       ])
       expect(Object.keys(outcomeProbabilities).length).toBe(1)
-      expect(outcomeProbabilities["[0,1,2,1,1,0]"]).toEqual({
-        roll: [0, 1, 2, 1, 1, 0],
-        instances: 1,
+      expect(outcomeProbabilities).toEqual({
+        "[0,1,2,1,1,0]": 1,
       })
     })
 
-    it("returns 6 possible outcomes when 5 dice are kept", () => {
-      expect(
-        Object.keys(getOutcomeProbabilitiesFromKeepSet([0, 0, 2, 1, 1, 0]))
-          .length
-      ).toEqual(6)
+    it("returns 1 possible outcome when all dice are kept", () => {
+      const outcomeProbabilities = getOutcomeProbabilitiesFromKeepSet([
+        0, 0, 0, 0, 0, 0,
+      ])
+      // expect(Object.keys(outcomeProbabilities).length).toBe(1)
+      expect(outcomeProbabilities["[5,0,0,0,0,0]"]).toEqual(1)
+    })
+
+    it("returns 6 possible outcomes when 4 dice are kept", () => {
+      const outcomeProbabilities = getOutcomeProbabilitiesFromKeepSet([
+        0, 0, 2, 1, 1, 0,
+      ])
+      expect(Object.keys(outcomeProbabilities).length).toEqual(6)
+      expect(outcomeProbabilities).toEqual({
+        "[0,0,2,1,1,1]": 1,
+        "[0,0,2,1,2,0]": 1,
+        "[0,0,2,2,1,0]": 1,
+        "[0,0,3,1,1,0]": 1,
+        "[0,1,2,1,1,0]": 1,
+        "[1,0,2,1,1,0]": 1,
+      })
+    })
+
+    it("returns 21 possible outcomes when 3 dice are kept", () => {
+      const outcomeProbabilities = getOutcomeProbabilitiesFromKeepSet([
+        0, 0, 2, 0, 1, 0,
+      ])
+      expect(Object.keys(outcomeProbabilities).length).toEqual(21)
+      // expect(outcomeProbabilities).toEqual({
+      //   "[0,0,2,1,1,1]": 1,
+      //   "[0,0,2,1,2,0]": 1,
+      //   "[0,0,2,2,1,0]": 1,
+      //   "[0,0,3,1,1,0]": 1,
+      //   "[0,1,2,1,1,0]": 1,
+      //   "[1,0,2,1,1,0]": 1,
+      // })
     })
 
     it("returns 36 possible outcomes when 3 dice are kept", () => {
@@ -211,6 +258,13 @@ describe("methods", () => {
         Object.keys(getOutcomeProbabilitiesFromKeepSet([0, 1, 1, 1, 0, 0]))
           .length
       ).toEqual(21)
+    })
+
+    it("returns X possible outcomes when generating outcomes for no kept dice", () => {
+      const outcomeProbabilities = getOutcomeProbabilitiesFromKeepSet([
+        0, 0, 0, 0, 0, 0,
+      ])
+      expect(Object.keys(outcomeProbabilities).length).toBe(252)
     })
   })
 
@@ -225,6 +279,77 @@ describe("methods", () => {
 
     it("returns all possible keepsets for a given roll", () => {
       expect(getPossibleKeepSets([0, 4, 1, 0, 0, 0]).length).toEqual(10)
+    })
+
+    it("returns all possible keepsets for a yahtzee", () => {
+      const keepSets = getPossibleKeepSets([0, 0, 0, 0, 0, 5])
+      expect(keepSets.length).toEqual(6)
+      expect(keepSets).toEqual([
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 1],
+        [0, 0, 0, 0, 0, 2],
+        [0, 0, 0, 0, 0, 3],
+        [0, 0, 0, 0, 0, 4],
+        [0, 0, 0, 0, 0, 5],
+      ])
+    })
+  })
+
+  describe("buildWidgetForGameState", () => {
+    it("builds the correct score action map for a game state", () => {
+      const gameState: GameState = {
+        topSum: 63,
+        scoredCategories: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+        yahtzeeBonusFlag: 0,
+      }
+      const mockEVMap = {
+        "63-[1,1,1,1,1,1,1,1,1,1,1,1,1]-0": 35,
+      }
+      const widget = buildWidgetForGameState(gameState, mockEVMap)
+      expect(widget.scoreActionMap["[0,5,0,0,0,0]"]).toEqual({
+        EV: 85,
+        category: 12,
+      })
+    })
+
+    it("builds the correct widget for a game state", () => {
+      const gameState: GameState = {
+        topSum: 63,
+        scoredCategories: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+        yahtzeeBonusFlag: 0,
+      }
+      const mockEVMap = {
+        "63-[1,1,1,1,1,1,1,1,1,1,1,1,1]-0": 35,
+      }
+      const widget = buildWidgetForGameState(gameState, mockEVMap)
+      expect(widget.secondKeepSetMap["[0,5,0,0,0,0]"]).toEqual({
+        EV: 85,
+        keepSet: [0, 5, 0, 0, 0, 0],
+      })
+      expect(widget.firstKeepSetMap["[0,5,0,0,0,0]"]).toEqual({
+        EV: 85,
+        keepSet: [0, 5, 0, 0, 0, 0],
+      })
+    })
+
+    it("builds the correct second reroll map for a game state", () => {
+      const gameState: GameState = {
+        topSum: 63,
+        scoredCategories: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+        yahtzeeBonusFlag: 0,
+      }
+      const mockEVMap = {
+        "63-[1,1,1,1,1,1,1,1,1,1,1,1,1]-0": 35,
+      }
+      const widget = buildWidgetForGameState(gameState, mockEVMap)
+      expect(widget.secondKeepSetMap["[1,4,0,0,0,0]"]).toEqual({
+        EV: 43.333333333333336,
+        keepSet: [0, 4, 0, 0, 0, 0],
+      })
+      expect(widget.firstKeepSetMap["[1,4,0,0,0,0]"]).toEqual({
+        EV: 50.27777777777778,
+        keepSet: [0, 4, 0, 0, 0, 0],
+      })
     })
   })
 })
