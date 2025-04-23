@@ -25,69 +25,31 @@ export const getScoreForRollInCategory = (
   // returns the score for a roll in a category
   switch (category) {
     case SCORE_CATEGORY.Ones:
-      return (
-        getPotentialYahtzeeBonus(roll, yahtzeeBonusFlag) ||
-        getCountScore(roll, 1)
-      )
+      return getCountScore(roll, 1)
     case SCORE_CATEGORY.Twos:
-      return (
-        getPotentialYahtzeeBonus(roll, yahtzeeBonusFlag) ||
-        getCountScore(roll, 2)
-      )
+      return getCountScore(roll, 2)
     case SCORE_CATEGORY.Threes:
-      return (
-        getPotentialYahtzeeBonus(roll, yahtzeeBonusFlag) ||
-        getCountScore(roll, 3)
-      )
+      return getCountScore(roll, 3)
     case SCORE_CATEGORY.Fours:
-      return (
-        getPotentialYahtzeeBonus(roll, yahtzeeBonusFlag) ||
-        getCountScore(roll, 4)
-      )
+      return getCountScore(roll, 4)
     case SCORE_CATEGORY.Fives:
-      return (
-        getPotentialYahtzeeBonus(roll, yahtzeeBonusFlag) ||
-        getCountScore(roll, 5)
-      )
+      return getCountScore(roll, 5)
     case SCORE_CATEGORY.Sixes:
-      return (
-        getPotentialYahtzeeBonus(roll, yahtzeeBonusFlag) ||
-        getCountScore(roll, 6)
-      )
+      return getCountScore(roll, 6)
     case SCORE_CATEGORY.ThreeOfAKind:
-      return (
-        getPotentialYahtzeeBonus(roll, yahtzeeBonusFlag) ||
-        getOfAKindScore(roll, 3)
-      )
+      return getOfAKindScore(roll, 3)
     case SCORE_CATEGORY.FourOfAKind:
-      return (
-        getPotentialYahtzeeBonus(roll, yahtzeeBonusFlag) ||
-        getOfAKindScore(roll, 4)
-      )
+      return getOfAKindScore(roll, 4)
     case SCORE_CATEGORY.FullHouse:
-      return (
-        getPotentialYahtzeeBonus(roll, yahtzeeBonusFlag) ||
-        getFullHouseScore(roll)
-      )
+      return getFullHouseScore(roll)
     case SCORE_CATEGORY.SmallStraight:
-      return (
-        getPotentialYahtzeeBonus(roll, yahtzeeBonusFlag) ||
-        getSmallStraightScore(roll)
-      )
+      return getSmallStraightScore(roll)
     case SCORE_CATEGORY.LargeStraight:
-      return (
-        getPotentialYahtzeeBonus(roll, yahtzeeBonusFlag) ||
-        getLargeStraightScore(roll)
-      )
+      return getLargeStraightScore(roll)
     case SCORE_CATEGORY.Chance:
-      return (
-        getPotentialYahtzeeBonus(roll, yahtzeeBonusFlag) || getChanceScore(roll)
-      )
+      return getChanceScore(roll)
     case SCORE_CATEGORY.Yahtzee:
-      return (
-        getPotentialYahtzeeBonus(roll, yahtzeeBonusFlag) ||
-        getYahtzeeScore(roll)
-      )
+      return getYahtzeeScore(roll)
   }
 }
 
@@ -169,7 +131,7 @@ export const getPossibleBitArrays = (length: number): Bit[][] => {
     result.push(booleanArray)
   }
 
-  return result
+  return result.sort()
 }
 
 export const canSumFromMultiples = (
@@ -201,7 +163,7 @@ export const isGameStatePossible = (gameState: GameState): boolean => {
     .slice(0, 6)
     .map((scoredCategory, index) => (scoredCategory ? index + 1 : 0))
   return (
-    canSumFromMultiples(topSum, scoredNumbers) &&
+    (topSum === 63 || canSumFromMultiples(topSum, scoredNumbers)) &&
     scoredCategories[12] === yahtzeeBonusFlag
   )
 }
@@ -257,6 +219,7 @@ export const getOutcomeProbabilitiesFromKeepSet = (
 } => {
   const diceToRoll = 5 - keepSet.reduce((a, b) => a + b)
   const outcomes = Math.pow(6, diceToRoll)
+  const outcomesList: string[] = []
   const outcomeProbabilites: {
     [key: string]: number
   } = {}
@@ -270,11 +233,17 @@ export const getOutcomeProbabilitiesFromKeepSet = (
     }
     // add the outcome to the map
     const outcomeRoll = mergeRolls(keepSet, outcome)
-    const outcomeStr = JSON.stringify(outcomeRoll)
-    outcomeProbabilites[outcomeStr] = !!(outcomeStr in outcomeProbabilites)
-      ? outcomeProbabilites[outcomeStr] + 1
-      : 1
+    const outcomeRollStr = JSON.stringify(outcomeRoll)
+    outcomesList.push(outcomeRollStr)
   }
+  // console.log("outcomesList: ", outcomesList.length)
+  outcomesList.forEach((outcomeRollStr) => {
+    outcomeProbabilites[outcomeRollStr] = !!(
+      outcomeRollStr in outcomeProbabilites
+    )
+      ? outcomeProbabilites[outcomeRollStr] + 1
+      : 1
+  })
   return outcomeProbabilites
 }
 
@@ -283,23 +252,23 @@ export const mergeRolls = (roll1: Roll, roll2: Roll): Roll => {
 }
 
 export const getStateAfterScoring = (
-  gameState: GameState,
+  topSum: number,
+  scoredCategories: Bit[],
   scoreCategory: number,
   score: number
 ): GameState => {
-  let { scoredCategories, topSum, yahtzeeBonusFlag } = gameState
-  scoredCategories[scoreCategory] = 1
-  yahtzeeBonusFlag = scoreCategory === 12 ? 1 : gameState.scoredCategories[12]
-  topSum = Math.min(63, topSum + (scoreCategory < 6 ? score : 0))
+  const scoredCategoriesCopy = [...scoredCategories]
+  scoredCategoriesCopy[scoreCategory] = 1
+  const yahtzeeBonusFlagCopy = scoreCategory === 12 ? 1 : scoredCategories[12]
   return {
-    topSum,
-    scoredCategories,
-    yahtzeeBonusFlag,
+    topSum: Math.min(63, topSum + (scoreCategory < 6 ? score : 0)),
+    scoredCategories: scoredCategoriesCopy,
+    yahtzeeBonusFlag: yahtzeeBonusFlagCopy,
   }
 }
 
-export const getUnscoredCategories = (gameState: GameState): number[] => {
-  return gameState.scoredCategories
+export const getUnscoredCategories = (scoredCategories: Bit[]): number[] => {
+  return scoredCategories
     .map((scored, index) => {
       return {
         index,
@@ -311,9 +280,10 @@ export const getUnscoredCategories = (gameState: GameState): number[] => {
 }
 
 export const buildWidgetForGameState = (
-  gameState: GameState,
+  gameStateStr: string,
   widgetMap: { [key: string]: number }
 ): Widget => {
+  const gameState = decodeGameState(gameStateStr)
   if (isFinalGameState(gameState)) {
     return {
       expectedScore: gameState.topSum >= 63 ? 35 : 0,
@@ -322,13 +292,14 @@ export const buildWidgetForGameState = (
   // Step 1. Calc EV for final dice states and score categories
   const possibleRolls = getPossibleRolls()
   const possibleKeepSets = getPossibleKeepSets()
-  const unscoredCategories = getUnscoredCategories(gameState)
+  const unscoredCategories = getUnscoredCategories(gameState.scoredCategories)
   const ScoreActionEVMap: {
     [key: string]: {
       EV: number
       category: SCORE_CATEGORY
     }
   } = {}
+
   for (let roll of possibleRolls) {
     const scores = unscoredCategories.map((category: SCORE_CATEGORY) => {
       const score = getScoreForRollInCategory(
@@ -336,22 +307,21 @@ export const buildWidgetForGameState = (
         category,
         gameState.yahtzeeBonusFlag
       )
-      if (
-        widgetMap[
-          encodeGameState(getStateAfterScoring(gameState, category, score))
-        ] === undefined
-      ) {
-        throw `state EV ${encodeGameState(
-          getStateAfterScoring(gameState, category, score)
-        )} not found in map, previous state: ${encodeGameState(gameState)}`
-      }
       return (
         score +
         widgetMap[
-          encodeGameState(getStateAfterScoring(gameState, category, score))
+          encodeGameState(
+            getStateAfterScoring(
+              gameState.topSum,
+              gameState.scoredCategories,
+              category,
+              score
+            )
+          )
         ]
       )
     })
+
     const maxScoreEV = Math.max(...scores)
     const maxScoreCategory = unscoredCategories[scores.indexOf(maxScoreEV)]
     ScoreActionEVMap[JSON.stringify(roll)] = {
@@ -414,7 +384,6 @@ export const buildWidgetForGameState = (
   } = {}
   for (let keepSet of possibleKeepSets) {
     const outcomeProbabilites = getOutcomeProbabilitiesFromKeepSet(keepSet)
-    const outcomeEVsCount = Object.keys(outcomeProbabilites).length
     let totalOutcomeEVWeight = 0
     const outcomeEVs = Object.keys(outcomeProbabilites).map((outcome) => {
       const optimalKeepSet = secondKeepSetMap[outcome]
@@ -452,19 +421,16 @@ export const buildWidgetForGameState = (
   }
 
   // Step 6. Get the EV for the whole widget
+  // for all possible outcomes find the keepset with the highest EV
   const possibleOutcomesAndProbabilities = getOutcomeProbabilitiesFromKeepSet([
     0, 0, 0, 0, 0, 0,
   ])
-  const outcomeCounts = Object.keys(possibleOutcomesAndProbabilities).length
   let totalOutcomeEVWeight = 0
   const outcomeEVs = Object.keys(possibleOutcomesAndProbabilities).map(
     (rollStr) => {
       const instances = possibleOutcomesAndProbabilities[rollStr]
-      if (firstKeepSetMap[rollStr] === undefined) {
-        console.error(rollStr)
-        throw "roll not found in first keepset"
-      }
       totalOutcomeEVWeight += instances
+      // console.log(firstKeepSetMap[rollStr])
       return firstKeepSetMap[rollStr].EV * instances
     }
   )

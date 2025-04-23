@@ -19,10 +19,9 @@ export const buildGameGraph = () => {
 
   // calculate EVs for each game state
   for (let gameStateString of gameStateStrings) {
-    const gameState = decodeGameState(gameStateString)
     try {
       widgetEVs[gameStateString] = buildWidgetForGameState(
-        gameState,
+        gameStateString,
         widgetEVs
       ).expectedScore
       counter += 1
@@ -31,9 +30,13 @@ export const buildGameGraph = () => {
       return
     }
 
-    if (counter % 1000 === 0) {
+    
+
+    if (counter % 100 === 0) {
       const currentTime = Date.now()
       const elapsedTime = currentTime - startTime
+      console.log("Sample game state: ", gameStateString)
+      console.log("EV: ", widgetEVs[gameStateString])
       console.log(
         `Processed ${counter}/${gameStateStrings.length} Widgets\nElapsed time: ${elapsedTime / 1000.0}s`
       )
