@@ -380,7 +380,8 @@ describe("methods", () => {
         encodeGameState(gameState),
         mockEVMap
       )
-      expect(widget.scoreActionMap["[0,5,0,0,0,0]"]).toEqual({
+
+      expect(widget.scoreActionMap?.["[0,5,0,0,0,0]"]).toEqual({
         EV: 85,
         category: 12,
       })
@@ -399,11 +400,11 @@ describe("methods", () => {
         encodeGameState(gameState),
         mockEVMap
       )
-      expect(widget.secondKeepSetMap["[0,5,0,0,0,0]"]).toEqual({
+      expect(widget.secondKeepSetMap?.["[0,5,0,0,0,0]"]).toEqual({
         EV: 85,
         keepSet: [0, 5, 0, 0, 0, 0],
       })
-      expect(widget.firstKeepSetMap["[0,5,0,0,0,0]"]).toEqual({
+      expect(widget.firstKeepSetMap?.["[0,5,0,0,0,0]"]).toEqual({
         EV: 85,
         keepSet: [0, 5, 0, 0, 0, 0],
       })
@@ -424,11 +425,11 @@ describe("methods", () => {
         encodeGameState(gameState),
         mockEVMap
       )
-      expect(widget.secondKeepSetMap["[1,4,0,0,0,0]"]).toEqual({
+      expect(widget.secondKeepSetMap?.["[1,4,0,0,0,0]"]).toEqual({
         EV: 24.2676183127572,
         keepSet: [0, 0, 0, 0, 0, 0],
       })
-      expect(widget.firstKeepSetMap["[0,4,0,1,0,0]"]).toEqual({
+      expect(widget.firstKeepSetMap?.["[0,4,0,1,0,0]"]).toEqual({
         EV: 43.888888888888864,
         keepSet: [0, 0, 0, 1, 0, 0],
       })

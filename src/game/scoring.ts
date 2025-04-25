@@ -131,17 +131,28 @@ export default class Scoring {
     },
   }
 
-  static sameDiceExpectedValue(differentDiceCount: number, rollsRemaining: number): number {
+  static sameDiceExpectedValue(
+    differentDiceCount: number,
+    rollsRemaining: number
+  ): number {
     const sameDiceCount = 5 - differentDiceCount
-    if (rollsRemaining === 0) { return 5 - differentDiceCount }
-    else if (rollsRemaining === 1) {
-      return sameDiceCount + (differentDiceCount / 6)
+    if (rollsRemaining === 0) {
+      return 5 - differentDiceCount
+    } else if (rollsRemaining === 1) {
+      return sameDiceCount + differentDiceCount / 6
     } else {
       let ev = 0
       let target = 0
       while (target <= differentDiceCount) {
-        const probability = ((1.0 / 6.0)**target) * (5.0 / 6.0)**(differentDiceCount - target)
-        const evOfLaterRoll = binomial(differentDiceCount, target) * probability * this.sameDiceExpectedValue(differentDiceCount - target, rollsRemaining - 1)
+        const probability =
+          (1.0 / 6.0) ** target * (5.0 / 6.0) ** (differentDiceCount - target)
+        const evOfLaterRoll =
+          binomial(differentDiceCount, target) *
+          probability *
+          this.sameDiceExpectedValue(
+            differentDiceCount - target,
+            rollsRemaining - 1
+          )
         ev += evOfLaterRoll
         target += 1
       }
@@ -153,22 +164,52 @@ export default class Scoring {
     [x: string]: (values: number[], rollsRemaining: number) => number
   } = {
     Ones: (values: number[], rollsRemaining: number): number => {
-      return this.sameDiceExpectedValue(values.filter(x => x !== 1).length, rollsRemaining) * 1
+      return (
+        this.sameDiceExpectedValue(
+          values.filter((x) => x !== 1).length,
+          rollsRemaining
+        ) * 1
+      )
     },
     Twos: (values: number[], rollsRemaining: number): number => {
-      return this.sameDiceExpectedValue(values.filter(x => x !== 2).length, rollsRemaining) * 2
+      return (
+        this.sameDiceExpectedValue(
+          values.filter((x) => x !== 2).length,
+          rollsRemaining
+        ) * 2
+      )
     },
     Threes: (values: number[], rollsRemaining: number): number => {
-      return this.sameDiceExpectedValue(values.filter(x => x !== 3).length, rollsRemaining) * 3
+      return (
+        this.sameDiceExpectedValue(
+          values.filter((x) => x !== 3).length,
+          rollsRemaining
+        ) * 3
+      )
     },
     Fours: (values: number[], rollsRemaining: number): number => {
-      return this.sameDiceExpectedValue(values.filter(x => x !== 4).length, rollsRemaining) * 4
+      return (
+        this.sameDiceExpectedValue(
+          values.filter((x) => x !== 4).length,
+          rollsRemaining
+        ) * 4
+      )
     },
     Fives: (values: number[], rollsRemaining: number): number => {
-      return this.sameDiceExpectedValue(values.filter(x => x !== 5).length, rollsRemaining) * 5
+      return (
+        this.sameDiceExpectedValue(
+          values.filter((x) => x !== 5).length,
+          rollsRemaining
+        ) * 5
+      )
     },
     Sixes: (values: number[], rollsRemaining: number): number => {
-      return this.sameDiceExpectedValue(values.filter(x => x !== 6).length, rollsRemaining) * 6
+      return (
+        this.sameDiceExpectedValue(
+          values.filter((x) => x !== 6).length,
+          rollsRemaining
+        ) * 6
+      )
     },
     "Three of a kind": (values: number[]): number => {
       if (
@@ -221,7 +262,27 @@ export default class Scoring {
     },
   }
 
-  static scorableReRollStrategy: {[key: string]: (values: number[]) => number[]} = {
+  static scorableTitleIndex = () => {
+    return [
+      "Ones",
+      "Twos",
+      "Threes",
+      "Fours",
+      "Fives",
+      "Sixes",
+      "Three of a kind",
+      "Four of a kind",
+      "Full House",
+      "Small Straight",
+      "Large Straight",
+      "Chance",
+      "Yahtzee",
+    ]
+  }
+
+  static scorableReRollStrategy: {
+    [key: string]: (values: number[]) => number[]
+  } = {
     Ones: (values: number[]) => indecesOfMatching(1, values),
     Twos: (values: number[]) => indecesOfMatching(2, values),
     Threes: (values: number[]) => indecesOfMatching(3, values),
@@ -237,7 +298,7 @@ export default class Scoring {
     Yahtzee: (values: number[]) => [], // reroll all but those that match
   }
 
-  static scorableMaxValue: {[key: string]: number} = {
+  static scorableMaxValue: { [key: string]: number } = {
     Ones: 5,
     Twos: 10,
     Threes: 15,

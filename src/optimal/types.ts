@@ -1,8 +1,22 @@
+type KeepSetMap = {
+  [key: string]: {
+    keepSet: Roll
+    EV: number
+  }
+}
+
+type ScoreActionMap = {
+  [key: string]: {
+    EV: number
+    category: SCORE_CATEGORY
+  }
+}
+
 export type Widget = {
   expectedScore: number
-  firstKeepSetMap?: any
-  secondKeepSetMap?: any
-  scoreActionMap?: any
+  firstKeepSetMap?: KeepSetMap
+  secondKeepSetMap?: KeepSetMap
+  scoreActionMap?: ScoreActionMap
 }
 
 export type Bit = 1 | 0

@@ -17,22 +17,21 @@ function Dice({
   selectedDice: Set<number>
   selectDie: (x: number) => void
 }) {
-
   const handleRollClick = () => {
     roll(selectedDice, rollsRemaining)
   }
 
   const renderDice = (dice: number[]): ReactNode => {
     return (
-      <div  className="flex justify-center mb-10 items-start gap-4">
+      <div className="flex justify-center mb-10 items-start gap-4">
         {dice.map((die, index) => {
           const dieRolling = !selectedDice.has(index) && rolling
           return (
             <div
-              style={{"animation": (dieRolling ? "jump .5s 1" : "")}}
+              style={{ animation: dieRolling ? "jump .5s 1" : "" }}
               key={index}
               className={classNames("transition-all mt-0", {
-                "mt-10": selectedDice.has(index)
+                "mt-10": selectedDice.has(index),
               })}
             >
               <Die
@@ -40,6 +39,7 @@ function Dice({
                 index={index}
                 value={die}
                 onSelect={selectDie}
+                className="shadow-md bg-white transition-all lg:h-24 lg:w-24 rounded-xl relative text-3xl flex content-center justify-center flex-wrap cursor-pointer hover:bg-gray-100"
               />
             </div>
           )
@@ -52,16 +52,20 @@ function Dice({
     <div>
       {renderDice(dice)}
       <div
-        className={classNames("mb-4 justify-center bg-red-600 border-b-4 border-red-400 flex text-white text-2xl px-16 py-4 cursor-pointer rounded-xl transition-all",
-          {"opacity-40": rollsRemaining === 0},
-          {"hover:opacity-90 active:border-0": rollsRemaining > 0})}
+        className={classNames(
+          "mb-4 justify-center bg-red-600 border-b-4 border-red-400 flex text-white text-2xl px-16 py-4 cursor-pointer rounded-xl transition-all",
+          { "opacity-40": rollsRemaining === 0 },
+          { "hover:opacity-90 active:border-0": rollsRemaining > 0 }
+        )}
         onClick={handleRollClick}
       >
         Roll
       </div>
-      {rollsRemaining > 0 && <div className="text-gray-400 font-normal text-center">
-        {rollsRemaining} rolls left
-      </div>}
+      {rollsRemaining > 0 && (
+        <div className="text-gray-400 font-normal text-center">
+          {rollsRemaining} rolls left
+        </div>
+      )}
     </div>
   )
 }
