@@ -41,7 +41,9 @@ export const buildGameGraph = () => {
 
   const endTime = Date.now()
   const elapsedTime = endTime - startTime
-  console.log(`Processed ${counter} Widgets\nElapsed time: ${elapsedTime} ms`)
+  console.log(
+    `Processed ${counter} Widgets\nElapsed time: ${elapsedTime / 1000.0}s`
+  )
 
   // write the graph to a file
   const widgetEVsJsonString = JSON.stringify(widgetEVs, null, 0)
