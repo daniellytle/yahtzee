@@ -4,9 +4,10 @@ import Scoring from "./scoring"
 import { diceRoll, getFreshDice } from "./utils"
 
 export class Runner {
-  static parseResponse = () => {}
-
-  static play = (player: Player, verbose: boolean = false): {[key: string]: number} => {
+  static play = (
+    player: Player,
+    verbose: boolean = false
+  ): { [key: string]: number } => {
     const scores: { [key: string]: number } = {}
     while (!Scoring.scorables.every((scorable: string) => scorable in scores)) {
       let rollsRemaining = 2
@@ -19,8 +20,12 @@ export class Runner {
           scores
         )
         if (response.scoreKey) {
-          scores[response.scoreKey] = Scoring.scorableRules[response.scoreKey](dice)
-          if (verbose) console.log(`Player scores dice ${dice.join(" ")} in ${response.scoreKey} for ${Scoring.scorableRules[response.scoreKey](dice)}`)
+          scores[response.scoreKey] = 
+            Scoring.scorableRules[response.scoreKey](dice)
+          if (verbose)
+            console.log(
+              `Player scores dice ${dice.join(" ")} in ${response.scoreKey} for ${Scoring.scorableRules[response.scoreKey](dice)}`
+            )
           break
         } else {
           if (rollsRemaining === 0) {
@@ -31,7 +36,8 @@ export class Runner {
             dice = dice.map((die, index) =>
               indeces.has(index) ? die : diceRoll()
             )
-            if (verbose) console.log(`Player ReRolls dice indeces ${Array.from(indeces)}`)
+            if (verbose)
+              console.log(`Player ReRolls dice indeces ${Array.from(indeces)}`)
             rollsRemaining -= 1
           }
         }

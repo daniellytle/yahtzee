@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { GameState, Roll, Widget } from "../optimal/types"
+import { GameState, Roll, SCORE_CATEGORY, Widget } from "../optimal/types"
 import Scoring from "../game/scoring"
 import {
   buildWidgetForGameState,
@@ -21,10 +21,9 @@ const Monitor = ({ dice, rollsRemaining, scores }: MonitorProps) => {
   }>({})
   const [message, setMessage] = useState<JSX.Element>()
 
-  const setRollContent = (roll: Roll): void => {
-    console.log(roll)
+  const setRollContent = (keepSet: Roll, expectedScore: number): void => {
     const die: number[] = []
-    roll.forEach((count, index) => {
+    keepSet.forEach((count, index) => {
       for (let i = 0; i < count; i++) {
         die.push(index + 1)
       }
@@ -45,34 +44,29 @@ const Monitor = ({ dice, rollsRemaining, scores }: MonitorProps) => {
             ))}
           </div>
         </div>
+        <div className="flex items-center flex-row space-x-4">
+          {`Expected Final Score: `}
+          {expectedScore.toFixed(2)}
+        </div>
       </div>
     )
   }
 
-  const setScoreContent = (category: number): void => {
+  const setScoreContent = (
+    category: SCORE_CATEGORY,
+    expectedScore: number
+  ): void => {
     setMessage(
       <div className="flex flex-col space-y-2">
-        <div className="flex flex-row space-x-2">
-          <div>{`Score ${Scoring.scorableTitleIndex()[category]}`}</div>
-        </div>
+        <div>{`Score ${Scoring.scorableTitleIndex()[category]}`}</div>
+        <div>{`Expected Final Score: ${expectedScore.toFixed(2)}`}</div>
       </div>
     )
   }
 
   useEffect(() => {
     // Get EV Map
-    const gameStateStrings = getAllPossibleGameStateStrings()
-    const gameStateEVMap = gameStateStrings.reduce(
-      (acc: { [key: string]: number }, gameStateString, index) => {
-        const gameStateEV = (gameStateEVs as number[])[index]
-        if (gameStateEV) {
-          acc[gameStateString] = gameStateEV
-        }
-        return acc
-      },
-      {}
-    )
-    setGameStateEVMap(gameStateEVMap)
+    setGameStateEVMap(gameStateEVs as { [key: string]: number })
   }, [])
 
   useEffect(() => {
@@ -101,30 +95,31 @@ const Monitor = ({ dice, rollsRemaining, scores }: MonitorProps) => {
       gameStateEVMap
     )
 
+    const currentScore = Object.values(scores).reduce((a, b) => a + b, 0)
+
     if (
       widget.expectedScore &&
       widget.firstKeepSetMap &&
       widget.secondKeepSetMap &&
       widget.scoreActionMap
     ) {
-      const firstReRoll = widget.firstKeepSetMap[JSON.stringify(roll)].keepSet
-      const secondReRoll = widget.secondKeepSetMap[JSON.stringify(roll)].keepSet
-      const scoreCategory = widget.scoreActionMap[JSON.stringify(roll)].category
+      const firstKeepSet = widget.firstKeepSetMap[JSON.stringify(roll)]
+      const secondKeepSet = widget.secondKeepSetMap[JSON.stringify(roll)]
+      const scoreAction = widget.scoreActionMap[JSON.stringify(roll)]
 
       if (
-        firstReRoll.reduce((acc, count) => acc + count, 0) === 5 ||
-        secondReRoll.reduce((acc, count) => acc + count, 0) === 5
+        firstKeepSet.keepSet.reduce((acc, count) => acc + count, 0) === 5 ||
+        secondKeepSet.keepSet.reduce((acc, count) => acc + count, 0) === 5
       ) {
-        setScoreContent(scoreCategory)
+        setScoreContent(scoreAction.category, currentScore + scoreAction.EV)
       } else if (rollsRemaining > 0 && widget.firstKeepSetMap) {
         if (rollsRemaining === 2) {
-          setRollContent(widget.firstKeepSetMap[JSON.stringify(roll)].keepSet)
+          setRollContent(firstKeepSet.keepSet, firstKeepSet.EV + currentScore)
         } else {
-          setRollContent(widget.secondKeepSetMap[JSON.stringify(roll)].keepSet)
+          setRollContent(secondKeepSet.keepSet, secondKeepSet.EV + currentScore)
         }
       } else if (rollsRemaining === 0 && widget.scoreActionMap) {
-        const category = widget.scoreActionMap[JSON.stringify(roll)].category
-        setScoreContent(category)
+        setScoreContent(scoreAction.category, currentScore + scoreAction.EV)
       }
     }
   }, [dice, rollsRemaining, scores])

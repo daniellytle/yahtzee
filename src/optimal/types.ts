@@ -1,5 +1,5 @@
-type KeepSetMap = {
-  [key: string]: {
+export type KeepSetMap = {
+  [roll: string]: {
     keepSet: Roll
     EV: number
   }

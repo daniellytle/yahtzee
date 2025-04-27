@@ -1,4 +1,11 @@
-import { SCORE_CATEGORY, Roll, Widget, Bit, GameState } from "./types"
+import {
+  SCORE_CATEGORY,
+  Roll,
+  Widget,
+  Bit,
+  GameState,
+  KeepSetMap,
+} from "./types"
 
 export const isFinalGameState = (gameState: GameState): boolean => {
   return gameState.scoredCategories.every((category) => category === 1)
@@ -279,6 +286,36 @@ export const getUnscoredCategories = (scoredCategories: Bit[]): number[] => {
     .map(({ index }) => index)
 }
 
+export const buildKeepSetMap = (
+  possibleRolls: Roll[],
+  reRollMap: { [key: string]: number }
+): KeepSetMap => {
+  const keepSetMap: KeepSetMap = {}
+
+  for (const roll of possibleRolls) {
+    const keepSets = getPossibleKeepSets(roll)
+    let maxEV: number = -1
+    let maxKeepSet: Roll = keepSets[0]
+    for (const keepSet of keepSets) {
+      const keepSetStr = JSON.stringify(keepSet)
+      if (reRollMap[keepSetStr] === undefined) {
+        throw `keepSet ${keepSetStr} not found in reroll map`
+      }
+      const keepSetEV = reRollMap[keepSetStr]
+
+      if (keepSetEV > maxEV || maxEV === -1) {
+        maxEV = keepSetEV
+        maxKeepSet = keepSet
+      }
+    }
+    keepSetMap[JSON.stringify(roll)] = {
+      keepSet: maxKeepSet,
+      EV: maxEV,
+    }
+  }
+  return keepSetMap
+}
+
 export const buildWidgetForGameState = (
   gameStateStr: string,
   widgetMap: { [key: string]: number }
@@ -350,33 +387,7 @@ export const buildWidgetForGameState = (
 
   // Step 3. Get optimal keepset for each possible outcome
   // for all possible outcomes find the keepset with the highest EV
-  const secondKeepSetMap: {
-    [key: string]: {
-      keepSet: Roll
-      EV: number
-    }
-  } = {}
-  for (const roll of possibleRolls) {
-    const keepSets = getPossibleKeepSets(roll)
-    let maxEV: number = -1
-    let maxKeepSet: Roll = keepSets[0]
-    for (const keepSet of keepSets) {
-      const keepSetStr = JSON.stringify(keepSet)
-      if (SecondReRollEVMap[keepSetStr] === undefined) {
-        throw `keepSet ${keepSetStr} not found in reroll map`
-      }
-      const keepSetEV = SecondReRollEVMap[keepSetStr]
-
-      if (keepSetEV > maxEV || maxEV === -1) {
-        maxEV = keepSetEV
-        maxKeepSet = keepSet
-      }
-    }
-    secondKeepSetMap[JSON.stringify(roll)] = {
-      keepSet: maxKeepSet,
-      EV: maxEV,
-    }
-  }
+  const secondKeepSetMap = buildKeepSetMap(possibleRolls, SecondReRollEVMap)
 
   // Step 4. Calc EV for first rerolls
   const firstReRollEVMap: {
@@ -396,29 +407,7 @@ export const buildWidgetForGameState = (
   }
 
   // Step 5. Get optimal keepset for each possible outcome
-  const firstKeepSetMap: {
-    [key: string]: {
-      keepSet: Roll
-      EV: number
-    }
-  } = {}
-  for (const roll of possibleRolls) {
-    const keepSets = getPossibleKeepSets(roll)
-    let maxEV: number = -1
-    let maxKeepSet: Roll = keepSets[0]
-    for (const keepSet of keepSets) {
-      const keepSetStr = JSON.stringify(keepSet)
-      const keepSetEV = firstReRollEVMap[keepSetStr]
-      if (keepSetEV > maxEV || maxEV === -1) {
-        maxEV = keepSetEV
-        maxKeepSet = keepSet
-      }
-    }
-    firstKeepSetMap[JSON.stringify(roll)] = {
-      keepSet: maxKeepSet,
-      EV: maxEV,
-    }
-  }
+  const firstKeepSetMap = buildKeepSetMap(possibleRolls, firstReRollEVMap)
 
   // Step 6. Get the EV for the whole widget
   // for all possible outcomes find the keepset with the highest EV

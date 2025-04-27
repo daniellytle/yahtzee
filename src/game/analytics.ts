@@ -1,5 +1,6 @@
 import { Player } from "./player"
 import { NaivePlayer } from "./players/naivePlayer"
+import { OptimalPlayer } from "./players/optimalPlayer"
 import { SmartPlayer } from "./players/smartPlayer"
 import { Runner } from "./runner"
 import Scoring from "./scoring"
@@ -29,5 +30,4 @@ export class Analytics {
   }
 }
 
-Analytics.playGames(new SmartPlayer(), 1000)
-// Analytics.playGames(new NaivePlayer(), 1000)
+Analytics.playGames(new OptimalPlayer(), 1000)

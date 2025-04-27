@@ -9,7 +9,6 @@ require("fs")
 export const buildGameGraph = () => {
   // work backwards from final states
   const widgetEVs: { [key: string]: number } = {}
-  const EVList: number[] = []
   const gameStateStrings = getAllPossibleGameStateStrings()
   let counter = 0
   // start a clock
@@ -25,7 +24,6 @@ export const buildGameGraph = () => {
         widgetEVs
       ).expectedScore
       widgetEVs[gameStateString] = EV
-      EVList.push(EV)
       counter += 1
     } catch (e) {
       console.error(`Error processing game state: ${gameStateString} ${e}`)
@@ -46,8 +44,11 @@ export const buildGameGraph = () => {
   console.log(`Processed ${counter} Widgets\nElapsed time: ${elapsedTime} ms`)
 
   // write the graph to a file
-  const EVListString = JSON.stringify(EVList, null, 0)
-  require("fs").writeFileSync("src/optimal/gameStateEVs.json", EVListString)
+  const widgetEVsJsonString = JSON.stringify(widgetEVs, null, 0)
+  require("fs").writeFileSync(
+    "src/optimal/gameStateEVs.json",
+    widgetEVsJsonString
+  )
 }
 
 buildGameGraph()
