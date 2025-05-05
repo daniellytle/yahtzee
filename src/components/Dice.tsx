@@ -25,14 +25,18 @@ function Dice({
     return (
       <div className="flex justify-center mb-10 items-start gap-4">
         {dice.map((die, index) => {
-          const dieRolling = !selectedDice.has(index) && rolling
+          const selected = selectedDice.has(index)
+          const dieRolling = !selected && rolling
           return (
             <div
               style={{ animation: dieRolling ? "jump .5s 1" : "" }}
               key={index}
-              className={classNames("transition-all mt-0", {
-                "mt-10": selectedDice.has(index),
-              })}
+              className={classNames(
+                "flex flex-col space-y-2 transition-all mt-0",
+                {
+                  "mt-10 opacity-50": selected,
+                }
+              )}
             >
               <Die
                 key={`${index}-${die}-${selectedDice.has(index)}`}
@@ -41,6 +45,16 @@ function Dice({
                 onSelect={selectDie}
                 className="shadow-md bg-white transition-all lg:h-24 lg:w-24 rounded-xl relative text-3xl flex content-center justify-center flex-wrap cursor-pointer hover:bg-gray-100"
               />
+              {
+                <div
+                  className={classNames(
+                    "text-center font-medium text-gray-400",
+                    { visible: selected, hidden: !selected }
+                  )}
+                >
+                  keep
+                </div>
+              }
             </div>
           )
         })}

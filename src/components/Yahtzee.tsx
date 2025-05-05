@@ -5,6 +5,7 @@ import { diceRoll, getFreshDice } from "../game/utils"
 import Scoring from "../game/scoring"
 import { GameReport } from "./GameReport"
 import Monitor from "./Monitor"
+import Menu from "./Menu"
 
 function Yahtzee() {
   const [dice, setDice] = useState<number[]>([])
@@ -99,6 +100,9 @@ function Yahtzee() {
 
   return (
     <div className="w-screen h-screen bg-slate-200 flex">
+      <div className="absolute top-0 w-full py-10 flex justify-center">
+        <Menu />
+      </div>
       <div className="container mx-auto font-bold lg:flex">
         <div className="order-2 h-3/5 lg:m-0 w-full lg:w-2/5 lg:h-full flex content-center flex-wrap">
           <ScoreCard
@@ -108,7 +112,7 @@ function Yahtzee() {
             rollsRemaining={rollsRemaining}
           />
         </div>
-        <div className="order-1 h-2/5 lg:m-0 w-full lg:w-3/5 lg:h-full flex justify-center content-center flex space-y-8 flex-wrap flex-col">
+        <div className="order-1 h-2/5 lg:m-0 w-full lg:w-3/5 lg:h-full justify-center content-center flex space-y-8 flex-wrap flex-col">
           <Dice
             dice={dice}
             roll={roll}
