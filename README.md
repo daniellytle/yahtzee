@@ -2,12 +2,16 @@
 
 Interactive Yahtzee Game
 
-
-# Instructions
+# Running the web app
 
 ```
-npm install
-npm start
+npm run start
+```
+
+# Building the game graph
+
+```
+npm run build-game-graph
 ```
 
 # Running Tests

@@ -12,22 +12,23 @@ export const isFinalGameState = (gameState: GameState): boolean => {
 }
 
 export const encodeGameState = (gameState: GameState) => {
-  const { topSum, scoredCategories, yahtzeeBonusFlag } = gameState
-  return `${topSum}-${JSON.stringify(scoredCategories)}-${yahtzeeBonusFlag}`
+  const { topSum, scoredCategories } = gameState
+  return `${topSum}-${scoredCategories.join("")}`
 }
 
 export const decodeGameState = (str: string): GameState => {
   return {
     topSum: JSON.parse(str.split("-")[0]),
-    scoredCategories: JSON.parse(str.split("-")[1]),
-    yahtzeeBonusFlag: JSON.parse(str.split("-")[2]),
+    scoredCategories: str
+      .split("-")[1]
+      .split("")
+      .map((str) => (str === "1" ? 1 : 0)),
   }
 }
 
 export const getScoreForRollInCategory = (
   roll: Roll,
-  category: SCORE_CATEGORY,
-  yahtzeeBonusFlag: Bit
+  category: SCORE_CATEGORY
 ): number => {
   // returns the score for a roll in a category
   switch (category) {
@@ -57,17 +58,6 @@ export const getScoreForRollInCategory = (
       return getChanceScore(roll)
     case SCORE_CATEGORY.Yahtzee:
       return getYahtzeeScore(roll)
-  }
-}
-
-export const getPotentialYahtzeeBonus = (
-  roll: Roll,
-  yahtzeeBonusFlag: Bit
-): number => {
-  if (yahtzeeBonusFlag === 1) {
-    return getYahtzeeScore(roll) > 0 ? 100 : 0
-  } else {
-    return 0
   }
 }
 
@@ -115,7 +105,6 @@ export const getAllPossibleGameStateStrings = (): string[] => {
       const gameState = {
         topSum,
         scoredCategories,
-        yahtzeeBonusFlag: scoredCategories[12],
       }
       if (isGameStatePossible(gameState)) {
         possibleWidgets.push(encodeGameState(gameState))
@@ -165,14 +154,11 @@ export const canSumFromMultiples = (
 
 export const isGameStatePossible = (gameState: GameState): boolean => {
   // Can the topsum number be achieved with the scored categories?
-  const { topSum, scoredCategories, yahtzeeBonusFlag } = gameState
+  const { topSum, scoredCategories } = gameState
   const scoredNumbers = scoredCategories
     .slice(0, 6)
     .map((scoredCategory, index) => (scoredCategory ? index + 1 : 0))
-  return (
-    (topSum === 63 || canSumFromMultiples(topSum, scoredNumbers)) &&
-    scoredCategories[12] === yahtzeeBonusFlag
-  )
+  return topSum === 63 || canSumFromMultiples(topSum, scoredNumbers)
 }
 
 export const getPossibleRolls = () => {
@@ -266,11 +252,9 @@ export const getStateAfterScoring = (
 ): GameState => {
   const scoredCategoriesCopy = [...scoredCategories]
   scoredCategoriesCopy[scoreCategory] = 1
-  const yahtzeeBonusFlagCopy = scoreCategory === 12 ? 1 : scoredCategories[12]
   return {
     topSum: Math.min(63, topSum + (scoreCategory < 6 ? score : 0)),
     scoredCategories: scoredCategoriesCopy,
-    yahtzeeBonusFlag: yahtzeeBonusFlagCopy,
   }
 }
 
@@ -339,11 +323,7 @@ export const buildWidgetForGameState = (
 
   for (let roll of possibleRolls) {
     const scores = unscoredCategories.map((category: SCORE_CATEGORY) => {
-      const score = getScoreForRollInCategory(
-        roll,
-        category,
-        gameState.yahtzeeBonusFlag
-      )
+      const score = getScoreForRollInCategory(roll, category)
       return (
         score +
         widgetMap[
@@ -378,10 +358,8 @@ export const buildWidgetForGameState = (
       totalOutcomeEVWeight += outcomeProbabilites[outcome]
       return scoreAction.EV * outcomeProbabilites[outcome]
     })
-    // console.log(outcomeEVs)
     const avgOutcomeEV =
       outcomeEVs.reduce((a, b) => a + b, 0) / totalOutcomeEVWeight
-    // console.log(avgOutcomeEV)
     SecondReRollEVMap[JSON.stringify(keepSet)] = avgOutcomeEV
   }
 
@@ -419,7 +397,6 @@ export const buildWidgetForGameState = (
     (rollStr) => {
       const instances = possibleOutcomesAndProbabilities[rollStr]
       totalOutcomeEVWeight += instances
-      // console.log(firstKeepSetMap[rollStr])
       return firstKeepSetMap[rollStr].EV * instances
     }
   )

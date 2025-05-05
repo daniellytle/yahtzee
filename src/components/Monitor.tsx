@@ -1,11 +1,7 @@
 import { useEffect, useState } from "react"
 import { GameState, Roll, SCORE_CATEGORY, Widget } from "../optimal/types"
 import Scoring from "../game/scoring"
-import {
-  buildWidgetForGameState,
-  encodeGameState,
-  getAllPossibleGameStateStrings,
-} from "../optimal/methods"
+import { buildWidgetForGameState, encodeGameState } from "../optimal/methods"
 import gameStateEVs from "../optimal/gameStateEVs.json"
 import Die from "./Die"
 
@@ -85,7 +81,6 @@ const Monitor = ({ dice, rollsRemaining, scores }: MonitorProps) => {
     const gameState: GameState = {
       topSum,
       scoredCategories,
-      yahtzeeBonusFlag: scoredCategories[12],
     }
     const gameStateString = encodeGameState(gameState)
 

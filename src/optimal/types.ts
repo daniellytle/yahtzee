@@ -27,7 +27,6 @@ export type KeepSet = [number, number, number, number, number, number]
 export type GameState = {
   topSum: number
   scoredCategories: Bit[]
-  yahtzeeBonusFlag: Bit
 }
 
 export enum SCORE_CATEGORY {

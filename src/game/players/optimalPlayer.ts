@@ -33,7 +33,6 @@ export class OptimalPlayer extends Player {
     const gameState: GameState = {
       topSum,
       scoredCategories,
-      yahtzeeBonusFlag: scoredCategories[12],
     }
     const gameStateString = encodeGameState(gameState)
 
