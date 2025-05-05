@@ -1,6 +1,8 @@
 import {
   buildWidgetForGameState,
   getAllPossibleGameStateStrings,
+  getPossibleKeepSets,
+  getPossibleRolls,
 } from "../optimal/methods"
 
 require("fs")
@@ -13,6 +15,7 @@ export const buildGameGraph = () => {
   let counter = 0
   // start a clock
   const startTime = Date.now()
+  let intervalTime = startTime
 
   console.log("Building game graph...")
 
@@ -29,13 +32,15 @@ export const buildGameGraph = () => {
       console.error(`Error processing game state: ${gameStateString} ${e}`)
       throw e
     }
+    if (counter % 100 === 0) {
+      const intervalLengthTime = Date.now() - intervalTime
+      const elapsedTime = Date.now() - startTime
 
-    if (counter % 1000 === 0) {
-      const currentTime = Date.now()
-      const elapsedTime = currentTime - startTime
       console.log(
         `Processed ${counter}/${gameStateStrings.length} Widgets\nElapsed time: ${elapsedTime / 1000.0}s`
       )
+      console.log(`${intervalLengthTime / 100}ms per widget`)
+      intervalTime = Date.now()
     }
   }
 
