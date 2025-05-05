@@ -183,7 +183,7 @@ export const getPossibleRolls = () => {
         for (let fours = 0; fours < 6; fours++) {
           for (let fives = 0; fives < 6; fives++) {
             for (let sixes = 0; sixes < 6; sixes++) {
-              if (ones + twos + threes + fours + fives + sixes != 5) {
+              if (ones + twos + threes + fours + fives + sixes !== 5) {
                 continue
               } else {
                 possibleRolls.push([ones, twos, threes, fours, fives, sixes])
@@ -299,7 +299,7 @@ export const buildKeepSetMap = (
     for (const keepSet of keepSets) {
       const keepSetStr = JSON.stringify(keepSet)
       if (reRollMap[keepSetStr] === undefined) {
-        throw `keepSet ${keepSetStr} not found in reroll map`
+        throw Error(`keepSet ${keepSetStr} not found in reroll map`)
       }
       const keepSetEV = reRollMap[keepSetStr]
 
