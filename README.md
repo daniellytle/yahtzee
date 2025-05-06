@@ -1,6 +1,6 @@
 # Yahtzee Game
 
-Interactive Yahtzee Game
+Interactive Yahtzee Game. Available at [dwil.xyz/yahtzee](dwil.xyz/yahtzee).
 
 # Running the web app
 
