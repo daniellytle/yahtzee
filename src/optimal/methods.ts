@@ -304,7 +304,11 @@ export const buildKeepSetMap = (
       }
       const keepSetEV = reRollMap[keepSetStr]
 
-      if (keepSetEV > maxEV || maxEV === -1) {
+      if (
+        keepSetEV >= maxEV ||
+        maxEV === -1 ||
+        (maxEV === keepSetEV && keepSet.reduce((a, b) => a + b, 0) === 5)
+      ) {
         maxEV = keepSetEV
         maxKeepSet = keepSet
       }
