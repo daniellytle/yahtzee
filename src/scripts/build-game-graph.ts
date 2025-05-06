@@ -1,8 +1,7 @@
 import {
   buildWidgetForGameState,
   getAllPossibleGameStateStrings,
-  getPossibleKeepSets,
-  getPossibleRolls,
+  getOutcomeProbabilitiesFromAllKeepSets,
 } from "../optimal/methods"
 
 require("fs")
@@ -11,6 +10,9 @@ require("fs")
 export const buildGameGraph = () => {
   // work backwards from final states
   const widgetEVs: { [key: string]: number } = {}
+  const keepSetProbabilitiesMap: {
+    [key: string]: { [key: string]: number }
+  } = getOutcomeProbabilitiesFromAllKeepSets()
   const gameStateStrings = getAllPossibleGameStateStrings()
   let counter = 0
   // start a clock
@@ -24,7 +26,8 @@ export const buildGameGraph = () => {
     try {
       const EV = buildWidgetForGameState(
         gameStateString,
-        widgetEVs
+        widgetEVs,
+        keepSetProbabilitiesMap
       ).expectedScore
       widgetEVs[gameStateString] = EV
       counter += 1

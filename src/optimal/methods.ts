@@ -205,6 +205,23 @@ export const getPossibleKeepSets = (roll: Roll = [5, 5, 5, 5, 5, 5]) => {
   return possibleKeepSets
 }
 
+export const getOutcomeProbabilitiesFromAllKeepSets = (): {
+  [keepSet: string]: {
+    [outcome: string]: number
+  }
+} => {
+  const output: {
+    [keepSet: string]: {
+      [outcome: string]: number
+    }
+  } = {}
+  for (let keepSet of getPossibleKeepSets()) {
+    output[JSON.stringify(keepSet)] =
+      getOutcomeProbabilitiesFromKeepSet(keepSet)
+  }
+  return output
+}
+
 export const getOutcomeProbabilitiesFromKeepSet = (
   keepSet: Roll
 ): {
@@ -302,7 +319,10 @@ export const buildKeepSetMap = (
 
 export const buildWidgetForGameState = (
   gameStateStr: string,
-  widgetMap: { [key: string]: number }
+  widgetMap: { [key: string]: number },
+  keepSetProbabilitiesMap: {
+    [key: string]: { [key: string]: number }
+  } = getOutcomeProbabilitiesFromAllKeepSets()
 ): Widget => {
   const gameState = decodeGameState(gameStateStr)
   if (isFinalGameState(gameState)) {
@@ -310,6 +330,8 @@ export const buildWidgetForGameState = (
       expectedScore: gameState.topSum >= 63 ? 35 : 0,
     }
   }
+  const startTime = Date.now()
+
   // Step 1. Calc EV for final dice states and score categories
   const possibleRolls = getPossibleRolls()
   const possibleKeepSets = getPossibleKeepSets()
@@ -346,12 +368,15 @@ export const buildWidgetForGameState = (
       category: maxScoreCategory,
     }
   }
+
+  const step1Time = Date.now()
   // Step 2. Calc EV for last rerolls
   const SecondReRollEVMap: {
     [key: string]: number
   } = {}
   for (let keepSet of possibleKeepSets) {
-    const outcomeProbabilites = getOutcomeProbabilitiesFromKeepSet(keepSet)
+    let outcomeProbabilites: { [key: string]: number }
+    outcomeProbabilites = keepSetProbabilitiesMap[JSON.stringify(keepSet)]
     let totalOutcomeEVWeight = 0
     const outcomeEVs = Object.keys(outcomeProbabilites).map((outcome) => {
       const scoreAction = ScoreActionEVMap[outcome]
@@ -362,17 +387,19 @@ export const buildWidgetForGameState = (
       outcomeEVs.reduce((a, b) => a + b, 0) / totalOutcomeEVWeight
     SecondReRollEVMap[JSON.stringify(keepSet)] = avgOutcomeEV
   }
+  const step2Time = Date.now()
 
   // Step 3. Get optimal keepset for each possible outcome
   // for all possible outcomes find the keepset with the highest EV
   const secondKeepSetMap = buildKeepSetMap(possibleRolls, SecondReRollEVMap)
+  const step3Time = Date.now()
 
   // Step 4. Calc EV for first rerolls
   const firstReRollEVMap: {
     [key: string]: number
   } = {}
   for (let keepSet of possibleKeepSets) {
-    const outcomeProbabilites = getOutcomeProbabilitiesFromKeepSet(keepSet)
+    const outcomeProbabilites = keepSetProbabilitiesMap[JSON.stringify(keepSet)]
     let totalOutcomeEVWeight = 0
     const outcomeEVs = Object.keys(outcomeProbabilites).map((outcome) => {
       const optimalKeepSet = secondKeepSetMap[outcome]
@@ -383,9 +410,12 @@ export const buildWidgetForGameState = (
       outcomeEVs.reduce((a, b) => a + b, 0) / totalOutcomeEVWeight
     firstReRollEVMap[JSON.stringify(keepSet)] = avgOutcomeEV
   }
+  const step4Time = Date.now()
 
   // Step 5. Get optimal keepset for each possible outcome
   const firstKeepSetMap = buildKeepSetMap(possibleRolls, firstReRollEVMap)
+
+  const step5Time = Date.now()
 
   // Step 6. Get the EV for the whole widget
   // for all possible outcomes find the keepset with the highest EV
@@ -402,6 +432,8 @@ export const buildWidgetForGameState = (
   )
   const totalAvgEV =
     outcomeEVs.reduce((a, b) => a + b, 0) / totalOutcomeEVWeight
+
+  const step6Time = Date.now()
 
   // Return the widget data
   return {

@@ -11,7 +11,10 @@ const Menu = () => {
         <a target="_blank" href="https://github.com/daniellytle/yahtzee">
           Github
         </a>
-        <a target="_blank" href="https://dwil.xyz/">
+        <a
+          target="_blank"
+          href="https://dwil.xyz/porting-the-optimal-yahtzee-algorithm-to-typescript/"
+        >
           About
         </a>
       </div>
