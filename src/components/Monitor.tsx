@@ -1,21 +1,28 @@
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { GameState, Roll, SCORE_CATEGORY, Widget } from "../optimal/types"
 import Scoring from "../game/scoring"
 import { buildWidgetForGameState, encodeGameState } from "../optimal/methods"
 import gameStateEVs from "../optimal/gameStateEVs.json"
 import Die from "./Die"
+import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react"
 
 type MonitorProps = {
+  selectedDice: Set<number>
   dice: number[]
   rollsRemaining: number
   scores: { [key: string]: number }
 }
 
-const Monitor = ({ dice, rollsRemaining, scores }: MonitorProps) => {
+const Monitor = ({
+  selectedDice,
+  dice,
+  rollsRemaining,
+  scores,
+}: MonitorProps) => {
   const [gameStateEVMap, setGameStateEVMap] = useState<{
     [key: string]: number
   }>({})
-  const [message, setMessage] = useState<JSX.Element>()
+  const [actionMessage, setActionMessage] = useState<JSX.Element>()
 
   const setRollContent = (keepSet: Roll, expectedScore: number): void => {
     const die: number[] = []
@@ -24,7 +31,7 @@ const Monitor = ({ dice, rollsRemaining, scores }: MonitorProps) => {
         die.push(index + 1)
       }
     })
-    setMessage(
+    setActionMessage(
       <div className="flex flex-col space-y-2">
         <div className="flex items-center flex-row space-x-4">
           <div>Keep</div>
@@ -40,10 +47,6 @@ const Monitor = ({ dice, rollsRemaining, scores }: MonitorProps) => {
             ))}
           </div>
         </div>
-        <div className="flex items-center flex-row space-x-4">
-          {`Expected Final Score: `}
-          {expectedScore.toFixed(2)}
-        </div>
       </div>
     )
   }
@@ -52,7 +55,7 @@ const Monitor = ({ dice, rollsRemaining, scores }: MonitorProps) => {
     category: SCORE_CATEGORY,
     expectedScore: number
   ): void => {
-    setMessage(
+    setActionMessage(
       <div className="flex flex-col space-y-2">
         <div>{`Score ${Scoring.scorableTitleIndex()[category]}`}</div>
         <div>{`Expected Final Score: ${expectedScore.toFixed(2)}`}</div>
@@ -60,12 +63,12 @@ const Monitor = ({ dice, rollsRemaining, scores }: MonitorProps) => {
     )
   }
 
-  useEffect(() => {
+  useMemo(() => {
     // Get EV Map
     setGameStateEVMap(gameStateEVs as { [key: string]: number })
   }, [])
 
-  useEffect(() => {
+  useMemo(() => {
     // Get Game State
     const diceMap = dice.reduce((acc: { [key: string]: number }, die) => {
       acc[die - 1] = acc[die - 1] ? acc[die - 1] + 1 : 1
@@ -120,8 +123,26 @@ const Monitor = ({ dice, rollsRemaining, scores }: MonitorProps) => {
   }, [dice, rollsRemaining, scores])
 
   return (
-    <div className="flex justify-center text-2xl">
-      <div>{message}</div>
+    <div>
+      <TabGroup className="flex flex-col items-center gap-y-6">
+        <TabList className="flex gap-4 bg-white p-2 border-gray-100 rounded-full items-center">
+          {["Assistant", "Checker", "Hidden"].map((tab) => (
+            <Tab
+              key={tab}
+              className="aria-selected:bg-gray-200 rounded-full px-3 py-1 text-md font-semibold text-black hover:bg-gray-200"
+            >
+              {tab}
+            </Tab>
+          ))}
+        </TabList>
+        <TabPanels>
+          <TabPanel>
+            <div>{actionMessage}</div>
+          </TabPanel>
+          <TabPanel></TabPanel>
+          <TabPanel></TabPanel>
+        </TabPanels>
+      </TabGroup>
     </div>
   )
 }

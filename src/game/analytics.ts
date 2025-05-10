@@ -30,4 +30,4 @@ export class Analytics {
   }
 }
 
-Analytics.playGames(new OptimalPlayer(), 200)
+Analytics.playGames(new OptimalPlayer(), 100)

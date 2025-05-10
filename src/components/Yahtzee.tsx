@@ -122,6 +122,7 @@ function Yahtzee() {
             selectDie={selectDie}
           />
           <Monitor
+            selectedDice={selectedDice}
             dice={dice}
             rollsRemaining={rollsRemaining}
             scores={scores}
