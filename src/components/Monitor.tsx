@@ -22,6 +22,7 @@ const Monitor = ({
     [key: string]: number
   }>({})
   const [isLoadingEVMap, setIsLoadingEVMAP] = useState(true)
+  const [selectedAssistantIndex, setSelectedAssistantIndex] = useState(0)
 
   const getRollContent = (keepSet: Roll, expectedScore: number): ReactNode => {
     const die: number[] = []
@@ -46,6 +47,7 @@ const Monitor = ({
             ))}
           </div>
         </div>
+        <div>{`Expected Score: ${expectedScore.toFixed(2)}`}</div>
       </div>
     )
   }
@@ -145,22 +147,28 @@ const Monitor = ({
     </div>
   ) : (
     <div>
-      <TabGroup className="flex flex-col items-center gap-y-6">
+      <TabGroup
+        className="flex flex-col items-center gap-y-6"
+        selectedIndex={selectedAssistantIndex}
+      >
         <TabList className="flex gap-4 bg-white p-2 border-gray-100 rounded-full items-center">
-          {["Assistant", "Checker", "Hidden"].map((tab) => (
+          {["Assistant", "Hidden"].map((tab, index) => (
             <Tab
+              data-focus="false"
               key={tab}
               className="aria-selected:bg-gray-200 rounded-full px-3 py-1 text-md font-semibold text-black hover:bg-gray-200"
+              onClick={(e) => {
+                setSelectedAssistantIndex(index)
+                e.stopPropagation()
+                e.preventDefault()
+              }}
             >
               {tab}
             </Tab>
           ))}
         </TabList>
         <TabPanels>
-          <TabPanel>
-            <div>{actionMessage}</div>
-          </TabPanel>
-          <TabPanel></TabPanel>
+          <TabPanel>{actionMessage}</TabPanel>
           <TabPanel></TabPanel>
         </TabPanels>
       </TabGroup>
