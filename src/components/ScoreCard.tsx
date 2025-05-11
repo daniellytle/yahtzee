@@ -34,7 +34,9 @@ function ScoreCard({
       <>
         {scorables.map((key, index) => {
           const locked = key in scores
-          const expectedValue: number = locked ? scores[key] : Scoring.scorableExpectedValue[key](dice, rollsRemaining)
+          const expectedValue: number = locked
+            ? scores[key]
+            : Scoring.scorableExpectedValue[key](dice, rollsRemaining)
           const maxScore: number = Scoring.scorableMaxValue[key]
           return (
             <div
@@ -76,25 +78,31 @@ function ScoreCard({
   }
 
   const renderBonus = (scores: { [key: string]: number }): ReactElement => {
-    return <>
-      <div
-        className={classNames("my-1 ml-8 py-2 px-4 rounded-md flex justify-between")}
-      >
-        <div>Sum</div>
-        <div className={"text-black"}>{Scoring.getCountingSum(scores)}</div>
-      </div>
-      <div
-        className={classNames("my-1 ml-8 py-2 px-4 rounded-md flex justify-between")}
-      >
-        <div>Bonus</div>
-        <div className={"text-black"}>{Scoring.getBonus(scores)}</div>
-      </div>
-    </>
+    return (
+      <>
+        <div
+          className={classNames(
+            "my-1 ml-8 py-2 px-4 rounded-md flex justify-between"
+          )}
+        >
+          <div>Sum</div>
+          <div className={"text-black"}>{Scoring.getCountingSum(scores)}</div>
+        </div>
+        <div
+          className={classNames(
+            "my-1 ml-8 py-2 px-4 rounded-md flex justify-between"
+          )}
+        >
+          <div>Bonus</div>
+          <div className={"text-black"}>{Scoring.getBonus(scores)}</div>
+        </div>
+      </>
+    )
   }
 
   return (
     <div className="w-full h-full max-w-md px-4 mx-auto flex">
-      <div className="mt-4 self-center h-full lg:h-auto w-full shadow-md grid grid-cols-1 p-2 bg-white border-gray-100 border rounded-xl">
+      <div className=" md:mt-0 self-center h-full md:h-auto w-full shadow-md grid grid-cols-1 p-2 bg-white border-gray-100 border rounded-xl">
         <div className="mt-1 px-4 pb-2 flex justify-between border-b">
           <div>Score</div>
           <div>Points</div>

@@ -103,8 +103,8 @@ function Yahtzee() {
       <div className="absolute top-0 w-full py-10 flex justify-center">
         <Menu />
       </div>
-      <div className="container mx-auto font-bold lg:flex">
-        <div className="order-2 h-3/5 lg:m-0 w-full lg:w-2/5 lg:h-full flex content-center flex-wrap">
+      <div className="container mx-auto font-bold flex md:flex-row flex-col mt-36 md:mt-0">
+        <div className="md:order-2 h-2/5 md:m-0 w-full md:w-2/5 md:h-full flex content-center flex-wrap">
           <ScoreCard
             scores={scores}
             dice={dice}
@@ -112,21 +112,23 @@ function Yahtzee() {
             rollsRemaining={rollsRemaining}
           />
         </div>
-        <div className="order-1 h-2/5 lg:m-0 w-full lg:w-3/5 lg:h-full justify-center content-center flex space-y-8 flex-wrap flex-col">
-          <Dice
-            dice={dice}
-            roll={roll}
-            rolling={rolling}
-            rollsRemaining={rollsRemaining}
-            selectedDice={selectedDice}
-            selectDie={selectDie}
-          />
-          <Monitor
-            selectedDice={selectedDice}
-            dice={dice}
-            rollsRemaining={rollsRemaining}
-            scores={scores}
-          />
+        <div className="md:order-1 h-2/5 md:m-0 md:w-3/5 md:h-full justify-center content-center flex flex-col">
+          <div className="flex flex-col items-center p-10 md:p-0 space-y-8">
+            <Dice
+              dice={dice}
+              roll={roll}
+              rolling={rolling}
+              rollsRemaining={rollsRemaining}
+              selectedDice={selectedDice}
+              selectDie={selectDie}
+            />
+            <Monitor
+              selectedDice={selectedDice}
+              dice={dice}
+              rollsRemaining={rollsRemaining}
+              scores={scores}
+            />
+          </div>
         </div>
       </div>
       <GameReport

@@ -46,7 +46,7 @@ const Monitor = ({
                     index={0}
                     value={die}
                     onSelect={() => {}}
-                    className="shadow-md bg-white transition-all lg:h-12 lg:w-12 rounded-xl relative flex content-center justify-center"
+                    className="shadow-md bg-white transition-all md:h-12 md:w-12 rounded-xl relative flex content-center justify-center"
                   />
                 ))}
               </div>
@@ -152,33 +152,31 @@ const Monitor = ({
       <div>Loading</div>
     </div>
   ) : (
-    <div>
-      <TabGroup
-        className="flex flex-col items-center gap-y-6"
-        selectedIndex={selectedAssistantIndex}
-      >
-        <TabList className="flex gap-4 bg-white p-2 border-gray-100 rounded-full items-center">
-          {["Assistant", "Hidden"].map((tab, index) => (
-            <Tab
-              data-focus="false"
-              key={tab}
-              className="aria-selected:bg-gray-200 rounded-full px-3 py-1 text-md font-semibold text-black hover:bg-gray-200"
-              onClick={(e) => {
-                setSelectedAssistantIndex(index)
-                e.stopPropagation()
-                e.preventDefault()
-              }}
-            >
-              {tab}
-            </Tab>
-          ))}
-        </TabList>
-        <TabPanels>
-          <TabPanel>{actionMessage}</TabPanel>
-          <TabPanel></TabPanel>
-        </TabPanels>
-      </TabGroup>
-    </div>
+    <TabGroup
+      className="flex flex-col items-center gap-y-6"
+      selectedIndex={selectedAssistantIndex}
+    >
+      <TabList className="flex gap-4 bg-white p-2 border-gray-100 rounded-full items-center">
+        {["Assistant", "Hidden"].map((tab, index) => (
+          <Tab
+            data-focus="false"
+            key={tab}
+            className="aria-selected:bg-gray-200 rounded-full px-3 py-1 text-md font-semibold text-black hover:bg-gray-200"
+            onClick={(e) => {
+              setSelectedAssistantIndex(index)
+              e.stopPropagation()
+              e.preventDefault()
+            }}
+          >
+            {tab}
+          </Tab>
+        ))}
+      </TabList>
+      <TabPanels>
+        <TabPanel>{actionMessage}</TabPanel>
+        <TabPanel></TabPanel>
+      </TabPanels>
+    </TabGroup>
   )
 }
 
