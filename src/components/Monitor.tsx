@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from "react"
 import { GameState, Roll, SCORE_CATEGORY, Widget } from "../optimal/types"
 import Scoring from "../game/scoring"
 import { buildWidgetForGameState, encodeGameState } from "../optimal/methods"
-import gameStateEVs from "../optimal/gameStateEVs.json"
 import Die from "./Die"
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react"
 
@@ -23,6 +22,7 @@ const Monitor = ({
     [key: string]: number
   }>({})
   const [actionMessage, setActionMessage] = useState<JSX.Element>()
+  const [isLoadingEVMap, setIsLoadingEVMAP] = useState(true)
 
   const setRollContent = (keepSet: Roll, expectedScore: number): void => {
     const die: number[] = []
@@ -63,9 +63,15 @@ const Monitor = ({
     )
   }
 
-  useMemo(() => {
-    // Get EV Map
-    setGameStateEVMap(gameStateEVs as { [key: string]: number })
+  useEffect(() => {
+    // Load game state EV map
+    const fetchGameStateEVMap = async () => {
+      const response = await fetch("/yahtzee/gameStateEVs.json")
+      const data = await response.json()
+      setGameStateEVMap(data)
+      setIsLoadingEVMAP(false)
+    }
+    fetchGameStateEVMap()
   }, [])
 
   useMemo(() => {
@@ -120,9 +126,13 @@ const Monitor = ({
         setScoreContent(scoreAction.category, currentScore + scoreAction.EV)
       }
     }
-  }, [dice, rollsRemaining, scores])
+  }, [dice, rollsRemaining, scores, gameStateEVMap])
 
-  return (
+  return isLoadingEVMap ? (
+    <div className="flex items-center">
+      <div>Loading</div>
+    </div>
+  ) : (
     <div>
       <TabGroup className="flex flex-col items-center gap-y-6">
         <TabList className="flex gap-4 bg-white p-2 border-gray-100 rounded-full items-center">

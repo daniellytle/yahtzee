@@ -1,6 +1,6 @@
 import { Player } from "../player"
 import { PlayerResponse } from "../playerResponse"
-import gameStateEVs from "../../optimal/gameStateEVs.json"
+import gameStateEVs from "../../../public/gameStateEVs.json"
 import { buildWidgetForGameState, encodeGameState } from "../../optimal/methods"
 import Scoring from "../scoring"
 import { GameState, Widget } from "../../optimal/types"

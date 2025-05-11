@@ -55,10 +55,7 @@ export const buildGameGraph = () => {
 
   // write the graph to a file
   const widgetEVsJsonString = JSON.stringify(widgetEVs, null, 0)
-  require("fs").writeFileSync(
-    "src/optimal/gameStateEVs.json",
-    widgetEVsJsonString
-  )
+  require("fs").writeFileSync("public/gameStateEVs.json", widgetEVsJsonString)
 }
 
 buildGameGraph()
