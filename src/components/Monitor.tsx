@@ -34,18 +34,24 @@ const Monitor = ({
     return (
       <div className="flex flex-col space-y-2">
         <div className="flex items-center flex-row space-x-4">
-          <div>Keep</div>
-          <div className="flex flex-row space-x-2">
-            {die.map((die, index) => (
-              <Die
-                key={index}
-                index={0}
-                value={die}
-                onSelect={() => {}}
-                className="shadow-md bg-white transition-all lg:h-12 lg:w-12 rounded-xl relative flex content-center justify-center"
-              />
-            ))}
-          </div>
+          {die.length === 0 ? (
+            <>Re-roll all dice</>
+          ) : (
+            <>
+              <div>Keep</div>
+              <div className="flex flex-row space-x-2">
+                {die.map((die, index) => (
+                  <Die
+                    key={index}
+                    index={0}
+                    value={die}
+                    onSelect={() => {}}
+                    className="shadow-md bg-white transition-all lg:h-12 lg:w-12 rounded-xl relative flex content-center justify-center"
+                  />
+                ))}
+              </div>
+            </>
+          )}
         </div>
         <div>{`Expected Score: ${expectedScore.toFixed(2)}`}</div>
       </div>
