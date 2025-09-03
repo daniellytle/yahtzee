@@ -23,7 +23,7 @@ function Dice({
 
   const renderDice = (dice: number[]): ReactNode => {
     return (
-      <div className="flex justify-center mb-10 items-start gap-4">
+      <div className="flex justify-center mb-4 md:mb-10 items-start gap-4">
         {dice.map((die, index) => {
           const selected = selectedDice.has(index)
           const dieRolling = !selected && rolling
@@ -34,7 +34,7 @@ function Dice({
               className={classNames(
                 "flex flex-col space-y-2 transition-all mt-0",
                 {
-                  "mt-10 opacity-50": selected,
+                  "md:mt-10 opacity-50": selected,
                 }
               )}
             >

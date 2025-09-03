@@ -103,7 +103,7 @@ function Yahtzee() {
       <div className="absolute top-0 w-full py-10 flex justify-center">
         <Menu />
       </div>
-      <div className="container mx-auto font-bold flex md:flex-row flex-col mt-36 md:mt-0">
+      <div className="container mx-auto font-bold flex md:flex-row flex-col mt-24 md:mt-0">
         <div className="md:order-2 h-2/5 md:m-0 w-full md:w-2/5 md:h-full flex content-center flex-wrap">
           <ScoreCard
             scores={scores}
@@ -112,8 +112,8 @@ function Yahtzee() {
             rollsRemaining={rollsRemaining}
           />
         </div>
-        <div className="md:order-1 h-2/5 md:m-0 md:w-3/5 md:h-full justify-center content-center flex flex-col">
-          <div className="flex flex-col items-center p-10 md:p-0 space-y-8">
+        <div className="md:order-1 h-3/5 md:m-0 md:w-3/5 md:h-full justify-center content-center flex flex-col">
+          <div className="flex flex-col items-center p-4 md:p-0 space-y-2 md:space-y-8">
             <Dice
               dice={dice}
               roll={roll}

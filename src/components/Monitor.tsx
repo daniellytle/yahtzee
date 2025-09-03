@@ -46,7 +46,7 @@ const Monitor = ({
                     index={0}
                     value={die}
                     onSelect={() => {}}
-                    className="shadow-md bg-white transition-all md:h-12 md:w-12 rounded-xl relative flex content-center justify-center"
+                    className="shadow-md bg-white transition-all h-12 w-12 rounded-xl relative flex content-center justify-center"
                   />
                 ))}
               </div>
